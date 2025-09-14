@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:grocerry_list/app/modules/home/views/home_page.dart';
 import '../../../controller/AuthController.dart';
-import 'LoginPage.dart';
+
 
 class SignUpPage extends StatelessWidget {
   SignUpPage({super.key});
@@ -46,7 +46,7 @@ class SignUpPage extends StatelessWidget {
                   passwordController.text,
                 );
                 Get.offAll(
-                  () => const HomePage(),
+                  () =>  HomePage(),
                 ); // Sign up done → redirect to login
               },
               child: const Text("Sign Up"),

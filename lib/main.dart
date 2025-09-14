@@ -35,7 +35,7 @@ class Root extends StatelessWidget {
     final AuthController authController = Get.put(AuthController());
     return Obx(() {
       if (authController.user != null) {
-        return const HomePage();
+        return  HomePage();
       } else {
         return const LoginPage();
       }
