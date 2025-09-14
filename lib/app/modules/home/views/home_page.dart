@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../controller/AuthController.dart';
 import 'list_details_page.dart';
 
-
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -22,42 +21,48 @@ class HomePage extends StatelessWidget {
         leading: uid == null
             ? const SizedBox()
             : StreamBuilder<DocumentSnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('users')
-              .doc(uid)
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: CircleAvatar(
-                  backgroundColor: Colors.grey,
-                  child: Icon(Icons.person, color: Colors.white),
-                ),
-              );
-            }
+                stream: FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(uid)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: CircleAvatar(
+                        backgroundColor: Colors.grey,
+                        child: Icon(Icons.person, color: Colors.white),
+                      ),
+                    );
+                  }
 
-            final data = snapshot.data!.data() as Map<String, dynamic>?;
-            final name = data?['name'] ?? '';
-            final firstLetter =
-            name.isNotEmpty ? name.toUpperCase() : '?';
+                  final data = snapshot.data!.data() as Map<String, dynamic>?;
+                  final name = data?['name'] ?? '';
+                  final firstLetter = name.isNotEmpty
+                      ? name.toUpperCase()
+                      : '?';
 
-            return Padding(
-              padding: const EdgeInsets.all(0.0),
-              child: CircleAvatar(
-                backgroundColor: Colors.blue,
-                child: Text(
-                  firstLetter,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
+                  return Padding(
+                    padding: const EdgeInsets.all(0.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        _showEditNameDialog(context, uid, name);
+                      },
+                      child: CircleAvatar(
+                        backgroundColor: Colors.grey,
+                        child: Text(
+                          firstLetter,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
         title: const Text("Grocery Lists"),
         centerTitle: true,
         actions: [
@@ -114,8 +119,8 @@ class HomePage extends StatelessWidget {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        Color(0xFF42A5F5), // নীল
-                        Color(0xFF7E57C2), // বেগুনি
+                        Colors.grey, // নীল
+                        Colors.grey, // বেগুনি
                       ],
                     ),
                   ),
@@ -126,10 +131,9 @@ class HomePage extends StatelessWidget {
                       children: [
                         Text(
                           "Overview",
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge
-                              ?.copyWith(color: Colors.white),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleLarge?.copyWith(color: Colors.white),
                         ),
                         const SizedBox(height: 8),
                         Text(
@@ -141,7 +145,9 @@ class HomePage extends StatelessWidget {
                           value: progress,
                           minHeight: 8,
                           backgroundColor: Colors.white24,
-                          valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
                         ),
                       ],
                     ),
@@ -164,7 +170,10 @@ class HomePage extends StatelessWidget {
                         : purchasedCount / itemsCount;
 
                     return Card(
-                      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -176,8 +185,8 @@ class HomePage extends StatelessWidget {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              Color(0xFF42A5F5), // নীল
-                              Color(0xFF7E57C2), // বেগুনি
+                              Colors.grey,
+                              Colors.grey, // বেগুনি
                             ],
                           ),
                         ),
@@ -185,10 +194,12 @@ class HomePage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(16),
                           onTap: () {
                             // লিস্ট আইটেম ট্যাপ করলে ডিটেইলস পেজ
-                            Get.to(() => ListDetailsPage(
-                              listId: doc.id,
-                              listName: name,
-                            ));
+                            Get.to(
+                              () => ListDetailsPage(
+                                listId: doc.id,
+                                listName: name,
+                              ),
+                            );
                           },
                           onLongPress: () {
                             if (data["ownerId"] == uid) {
@@ -202,7 +213,8 @@ class HomePage extends StatelessWidget {
                                 // বামদিকে টাইটেল ও প্রগ্রেস
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         name,
@@ -215,7 +227,9 @@ class HomePage extends StatelessWidget {
                                       const SizedBox(height: 6),
                                       Text(
                                         "$purchasedCount of $itemsCount items purchased",
-                                        style: const TextStyle(color: Colors.white70),
+                                        style: const TextStyle(
+                                          color: Colors.white70,
+                                        ),
                                       ),
                                       const SizedBox(height: 6),
                                       ClipRRect(
@@ -224,7 +238,10 @@ class HomePage extends StatelessWidget {
                                           value: percent,
                                           minHeight: 6,
                                           backgroundColor: Colors.white24,
-                                          valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                                          valueColor:
+                                              const AlwaysStoppedAnimation<
+                                                Color
+                                              >(Colors.white),
                                         ),
                                       ),
                                     ],
@@ -233,12 +250,17 @@ class HomePage extends StatelessWidget {
                                 const SizedBox(width: 8),
                                 // ডানদিকে আইকন বাটন
                                 IconButton(
-                                  icon: const Icon(Icons.arrow_forward_ios, color: Colors.white),
+                                  icon: const Icon(
+                                    Icons.arrow_forward_ios,
+                                    color: Colors.white,
+                                  ),
                                   onPressed: () {
-                                    Get.to(() => ListDetailsPage(
-                                      listId: doc.id,
-                                      listName: name,
-                                    ));
+                                    Get.to(
+                                      () => ListDetailsPage(
+                                        listId: doc.id,
+                                        listName: name,
+                                      ),
+                                    );
                                   },
                                 ),
                               ],
@@ -249,7 +271,6 @@ class HomePage extends StatelessWidget {
                     );
                   },
                 ),
-
               ),
             ],
           );
@@ -278,15 +299,17 @@ class HomePage extends StatelessWidget {
           TextButton(
             onPressed: () async {
               if (controller.text.isNotEmpty && uid != null) {
-                await FirebaseFirestore.instance.collection("grocery_lists").add({
-                  "name": controller.text,
-                  "ownerId": uid,
-                  "members": [uid],
-                  "itemsCount": 0,
-                  "purchasedCount": 0,
-                  "createdAt": FieldValue.serverTimestamp(),
-                  "completed": false,
-                });
+                await FirebaseFirestore.instance
+                    .collection("grocery_lists")
+                    .add({
+                      "name": controller.text,
+                      "ownerId": uid,
+                      "members": [uid],
+                      "itemsCount": 0,
+                      "purchasedCount": 0,
+                      "createdAt": FieldValue.serverTimestamp(),
+                      "completed": false,
+                    });
                 Get.back();
               }
             },
@@ -296,6 +319,49 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
+
+
+  void _showEditNameDialog(BuildContext context,String uid, String currentName) {
+    final TextEditingController controller = TextEditingController(text: currentName);
+
+    Get.dialog(
+      AlertDialog(
+        title: const Text("Edit Name"),
+        backgroundColor: Colors.grey[50],
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(hintText: "Enter new name"),
+        ),
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: const Text("Cancel")),
+          TextButton(
+            onPressed: () async {
+              final newName = controller.text.trim();
+              if (newName.isNotEmpty) {
+
+                await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(uid)
+                    .update({'name': newName});
+
+              }
+              Get.back();
+              Get.snackbar(
+                "Updated",
+                "Name updated successfully",
+                snackPosition: SnackPosition.BOTTOM,
+              );
+            },
+            child: const Text("Save"),
+          ),
+        ],
+      ),
+      barrierDismissible: true,
+    );
+  }
+
+
+
   void _showOwnerActions(BuildContext context, String listId, String name) {
     final TextEditingController controller = TextEditingController(text: name);
 
@@ -306,24 +372,19 @@ class HomePage extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.edit),
             title: const Text("Rename List"),
-            onTap: () async {
-              Navigator.pop(context); // bottom sheet বন্ধ
-
+            onTap: () {
+              Get.back(); // bottom sheet close
+              final TextEditingController controller = TextEditingController(text: name);
               showDialog(
                 context: context,
                 builder: (_) => AlertDialog(
                   title: const Text("Rename List"),
                   content: TextField(
                     controller: controller,
-                    decoration: const InputDecoration(
-                      hintText: "Enter new list name",
-                    ),
+                    decoration: const InputDecoration(hintText: "Enter new list name"),
                   ),
                   actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text("Cancel"),
-                    ),
+                    TextButton(onPressed: () => Get.back(), child: const Text("Cancel")),
                     TextButton(
                       onPressed: () async {
                         final newName = controller.text.trim();
@@ -332,10 +393,13 @@ class HomePage extends StatelessWidget {
                               .collection("grocery_lists")
                               .doc(listId)
                               .update({"name": newName});
-                          Get.snackbar("Updated", "List renamed successfully",
-                              snackPosition: SnackPosition.BOTTOM);
+                          Get.snackbar(
+                            "Updated",
+                            "List renamed successfully",
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
                         }
-                        Navigator.pop(context);
+                        Get.back(); // Save
                       },
                       child: const Text("Save"),
                     ),
@@ -344,6 +408,7 @@ class HomePage extends StatelessWidget {
               );
             },
           ),
+
           ListTile(
             leading: const Icon(Icons.delete),
             title: const Text("Delete List"),
@@ -353,8 +418,11 @@ class HomePage extends StatelessWidget {
                   .collection("grocery_lists")
                   .doc(listId)
                   .delete();
-              Get.snackbar("Deleted", "$name deleted successfully",
-                  snackPosition: SnackPosition.BOTTOM);
+              Get.snackbar(
+                "Deleted",
+                "$name deleted successfully",
+                snackPosition: SnackPosition.BOTTOM,
+              );
             },
           ),
           ListTile(
@@ -366,8 +434,11 @@ class HomePage extends StatelessWidget {
                   .collection("grocery_lists")
                   .doc(listId)
                   .update({"completed": true});
-              Get.snackbar("Completed", "$name marked as completed",
-                  snackPosition: SnackPosition.BOTTOM);
+              Get.snackbar(
+                "Completed",
+                "$name marked as completed",
+                snackPosition: SnackPosition.BOTTOM,
+              );
             },
           ),
           ListTile(
@@ -396,8 +467,9 @@ class HomePage extends StatelessWidget {
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text("Cancel")),
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text("Cancel"),
+          ),
           TextButton(
             onPressed: () async {
               final email = emailController.text.trim();
@@ -411,8 +483,11 @@ class HomePage extends StatelessWidget {
                     .get();
 
                 if (userQuery.docs.isEmpty) {
-                  Get.snackbar("Error", "User not found",
-                      snackPosition: SnackPosition.BOTTOM);
+                  Get.snackbar(
+                    "Error",
+                    "User not found",
+                    snackPosition: SnackPosition.BOTTOM,
+                  );
                   return;
                 }
 
@@ -423,15 +498,21 @@ class HomePage extends StatelessWidget {
                     .collection("grocery_lists")
                     .doc(listId)
                     .update({
-                  "members": FieldValue.arrayUnion([uidToAdd])
-                });
+                      "members": FieldValue.arrayUnion([uidToAdd]),
+                    });
 
                 Navigator.of(dialogContext).pop();
-                Get.snackbar("Success", "$email added to the list",
-                    snackPosition: SnackPosition.BOTTOM);
+                Get.snackbar(
+                  "Success",
+                  "$email added to the list",
+                  snackPosition: SnackPosition.BOTTOM,
+                );
               } catch (e) {
-                Get.snackbar("Error", e.toString(),
-                    snackPosition: SnackPosition.BOTTOM);
+                Get.snackbar(
+                  "Error",
+                  e.toString(),
+                  snackPosition: SnackPosition.BOTTOM,
+                );
               }
             },
             child: const Text("Invite"),
@@ -440,7 +521,4 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
-
-
 }
-
