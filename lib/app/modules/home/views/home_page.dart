@@ -14,8 +14,52 @@ class HomePage extends StatelessWidget {
     final uid = authController.user?.uid;
 
     return Scaffold(
+      backgroundColor: Colors.green[50],
       appBar: AppBar(
-        title: const Text("My Grocery Lists"),
+        titleSpacing: 0,
+        backgroundColor: Colors.green[50],
+        leadingWidth: 60,
+        leading: uid == null
+            ? const SizedBox()
+            : StreamBuilder<DocumentSnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('users')
+              .doc(uid)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: CircleAvatar(
+                  backgroundColor: Colors.grey,
+                  child: Icon(Icons.person, color: Colors.white),
+                ),
+              );
+            }
+
+            final data = snapshot.data!.data() as Map<String, dynamic>?;
+            final name = data?['name'] ?? '';
+            final firstLetter =
+            name.isNotEmpty ? name.toUpperCase() : '?';
+
+            return Padding(
+              padding: const EdgeInsets.all(0.0),
+              child: CircleAvatar(
+                backgroundColor: Colors.blue,
+                child: Text(
+                  firstLetter,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+        title: const Text("Grocery Lists"),
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -42,7 +86,6 @@ class HomePage extends StatelessWidget {
             return const Center(child: Text("No grocery lists yet"));
           }
 
-          // ✅ Count completed & incomplete lists
           int completed = 0;
           int incomplete = 0;
           for (var doc in lists) {
@@ -58,30 +101,53 @@ class HomePage extends StatelessWidget {
 
           return Column(
             children: [
-              // 🔹 Summary Card at the top
               Card(
                 margin: const EdgeInsets.all(12),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Overview", style: Theme.of(context).textTheme.titleLarge),
-                      const SizedBox(height: 8),
-                      Text("Completed: $completed   |   Incomplete: $incomplete"),
-                      const SizedBox(height: 8),
-                      LinearProgressIndicator(
-                        value: progress,
-                        minHeight: 8,
-                        backgroundColor: Colors.grey[300],
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-                      ),
-                    ],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 6,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFF42A5F5), // নীল
+                        Color(0xFF7E57C2), // বেগুনি
+                      ],
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Overview",
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge
+                              ?.copyWith(color: Colors.white),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          "Completed: $completed   |   Incomplete: $incomplete",
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        const SizedBox(height: 8),
+                        LinearProgressIndicator(
+                          value: progress,
+                          minHeight: 8,
+                          backgroundColor: Colors.white24,
+                          valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-
-              // 🔹 Expanded ListView of grocery lists
               Expanded(
                 child: ListView.builder(
                   itemCount: lists.length,
@@ -98,35 +164,92 @@ class HomePage extends StatelessWidget {
                         : purchasedCount / itemsCount;
 
                     return Card(
-                      margin: const EdgeInsets.all(10),
-                      child: ListTile(
-                        title: Text(name, style: const TextStyle(fontSize: 18)),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("$purchasedCount of $itemsCount items purchased"),
-                            const SizedBox(height: 4),
-                            LinearProgressIndicator(value: percent),
-                          ],
+                      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 6,
+                      child: Ink(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          gradient: const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Color(0xFF42A5F5), // নীল
+                              Color(0xFF7E57C2), // বেগুনি
+                            ],
+                          ),
                         ),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.arrow_forward_ios),
-                          onPressed: () {
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () {
+                            // লিস্ট আইটেম ট্যাপ করলে ডিটেইলস পেজ
                             Get.to(() => ListDetailsPage(
                               listId: doc.id,
                               listName: name,
                             ));
                           },
+                          onLongPress: () {
+                            if (data["ownerId"] == uid) {
+                              _showOwnerActions(context, doc.id, name);
+                            }
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              children: [
+                                // বামদিকে টাইটেল ও প্রগ্রেস
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        name,
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        "$purchasedCount of $itemsCount items purchased",
+                                        style: const TextStyle(color: Colors.white70),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(4),
+                                        child: LinearProgressIndicator(
+                                          value: percent,
+                                          minHeight: 6,
+                                          backgroundColor: Colors.white24,
+                                          valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                // ডানদিকে আইকন বাটন
+                                IconButton(
+                                  icon: const Icon(Icons.arrow_forward_ios, color: Colors.white),
+                                  onPressed: () {
+                                    Get.to(() => ListDetailsPage(
+                                      listId: doc.id,
+                                      listName: name,
+                                    ));
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                        onLongPress: () {
-                          if (data["ownerId"] == uid) {
-                            _showOwnerActions(context, doc.id, name);
-                          }
-                        },
                       ),
                     );
                   },
                 ),
+
               ),
             ],
           );
@@ -184,13 +307,41 @@ class HomePage extends StatelessWidget {
             leading: const Icon(Icons.edit),
             title: const Text("Rename List"),
             onTap: () async {
-              Navigator.pop(context);
-              await FirebaseFirestore.instance
-                  .collection("grocery_lists")
-                  .doc(listId)
-                  .update({"name": controller.text});
-              Get.snackbar("Updated", "List renamed successfully",
-                  snackPosition: SnackPosition.BOTTOM);
+              Navigator.pop(context); // bottom sheet বন্ধ
+
+              showDialog(
+                context: context,
+                builder: (_) => AlertDialog(
+                  title: const Text("Rename List"),
+                  content: TextField(
+                    controller: controller,
+                    decoration: const InputDecoration(
+                      hintText: "Enter new list name",
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text("Cancel"),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        final newName = controller.text.trim();
+                        if (newName.isNotEmpty) {
+                          await FirebaseFirestore.instance
+                              .collection("grocery_lists")
+                              .doc(listId)
+                              .update({"name": newName});
+                          Get.snackbar("Updated", "List renamed successfully",
+                              snackPosition: SnackPosition.BOTTOM);
+                        }
+                        Navigator.pop(context);
+                      },
+                      child: const Text("Save"),
+                    ),
+                  ],
+                ),
+              );
             },
           ),
           ListTile(
@@ -223,16 +374,15 @@ class HomePage extends StatelessWidget {
             leading: const Icon(Icons.person_add),
             title: const Text("Invite Member"),
             onTap: () {
-              Navigator.of(context).pop(); // close bottom sheet first
+              Navigator.of(context).pop();
               _showInviteDialog(context, listId);
             },
           ),
-
         ],
       ),
     );
-
   }
+
   void _showInviteDialog(BuildContext context, String listId) {
     final TextEditingController emailController = TextEditingController();
 

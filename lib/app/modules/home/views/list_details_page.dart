@@ -18,7 +18,9 @@ class ListDetailsPage extends StatelessWidget {
     final TextEditingController itemController = TextEditingController();
 
     return Scaffold(
+      backgroundColor: Colors.green[50],
       appBar: AppBar(
+        backgroundColor: Colors.green[50],
         title: Text(listName),
       ),
       body: StreamBuilder<QuerySnapshot>(
