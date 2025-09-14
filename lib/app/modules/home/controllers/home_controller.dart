@@ -12,6 +12,8 @@ class HomeController extends GetxController {
   var completedCount = 0.obs;
   var incompleteCount = 0.obs;
 
+  final RxInt selectedIndex = 0.obs;
+
   String? get uid => authController.user?.uid;
 
   @override
@@ -24,14 +26,20 @@ class HomeController extends GetxController {
   }
 
   void _listenUserName() {
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .snapshots()
-        .listen((snapshot) {
+    FirebaseFirestore.instance.collection('users').doc(uid).snapshots().listen((
+      snapshot,
+    ) {
       final data = snapshot.data() as Map<String, dynamic>?;
       userName.value = data?['name'] ?? '';
     });
+  }
+
+
+  void changeTab(int index) {
+    if (index == 1) {
+      return;
+    }
+    selectedIndex.value = index;
   }
 
   void _listenGroceryLists() {
@@ -40,9 +48,9 @@ class HomeController extends GetxController {
         .where('members', arrayContains: uid)
         .snapshots()
         .listen((snapshot) {
-      lists.value = snapshot.docs;
-      _updateProgress();
-    });
+          lists.value = snapshot.docs;
+          _updateProgress();
+        });
   }
 
   void _updateProgress() {
@@ -67,10 +75,9 @@ class HomeController extends GetxController {
 
   Future<void> updateUserName(String newName) async {
     if (uid == null || newName.isEmpty) return;
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .update({'name': newName});
+    await FirebaseFirestore.instance.collection('users').doc(uid).update({
+      'name': newName,
+    });
   }
 
   Future<void> createList(String name) async {
@@ -92,8 +99,11 @@ class HomeController extends GetxController {
         .collection("grocery_lists")
         .doc(listId)
         .update({"name": newName});
-    Get.snackbar("Updated", "List renamed successfully",
-        snackPosition: SnackPosition.BOTTOM);
+    Get.snackbar(
+      "Updated",
+      "List renamed successfully",
+      snackPosition: SnackPosition.BOTTOM,
+    );
   }
 
   Future<void> deleteList(String listId, String name) async {
@@ -101,8 +111,11 @@ class HomeController extends GetxController {
         .collection("grocery_lists")
         .doc(listId)
         .delete();
-    Get.snackbar("Deleted", "$name deleted successfully",
-        snackPosition: SnackPosition.BOTTOM);
+    Get.snackbar(
+      "Deleted",
+      "$name deleted successfully",
+      snackPosition: SnackPosition.BOTTOM,
+    );
   }
 
   Future<void> markCompleted(String listId, String name) async {
@@ -110,8 +123,11 @@ class HomeController extends GetxController {
         .collection("grocery_lists")
         .doc(listId)
         .update({"completed": true});
-    Get.snackbar("Completed", "$name marked as completed",
-        snackPosition: SnackPosition.BOTTOM);
+    Get.snackbar(
+      "Completed",
+      "$name marked as completed",
+      snackPosition: SnackPosition.BOTTOM,
+    );
   }
 
   Future<void> inviteMember(String listId, String email) async {
@@ -123,8 +139,11 @@ class HomeController extends GetxController {
         .get();
 
     if (userQuery.docs.isEmpty) {
-      Get.snackbar("Error", "User not found",
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        "Error",
+        "User not found",
+        snackPosition: SnackPosition.BOTTOM,
+      );
       return;
     }
 
@@ -134,10 +153,13 @@ class HomeController extends GetxController {
         .collection("grocery_lists")
         .doc(listId)
         .update({
-      "members": FieldValue.arrayUnion([uidToAdd]),
-    });
+          "members": FieldValue.arrayUnion([uidToAdd]),
+        });
 
-    Get.snackbar("Success", "$email added to the list",
-        snackPosition: SnackPosition.BOTTOM);
+    Get.snackbar(
+      "Success",
+      "$email added to the list",
+      snackPosition: SnackPosition.BOTTOM,
+    );
   }
 }
