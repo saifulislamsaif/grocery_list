@@ -2,6 +2,8 @@ import 'package:get/get.dart';
 
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
+import '../modules/invitation/bindings/invitation_binding.dart';
+import '../modules/invitation/views/invitation_view.dart';
 import '../modules/signup/bindings/signup_binding.dart';
 import '../modules/signup/views/signup_view.dart';
 

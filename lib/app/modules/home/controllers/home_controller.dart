@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 
@@ -5,12 +7,12 @@ import '../../../controller/AuthController.dart';
 
 class HomeController extends GetxController {
   final AuthController authController = Get.find();
-
-  // Reactive variables
   var userName = ''.obs;
   var lists = <DocumentSnapshot>[].obs;
   var completedCount = 0.obs;
   var incompleteCount = 0.obs;
+  late StreamSubscription<DocumentSnapshot> _userSub;
+  late StreamSubscription<QuerySnapshot> _listsSub;
 
   final RxInt selectedIndex = 0.obs;
 
@@ -25,15 +27,40 @@ class HomeController extends GetxController {
     }
   }
 
-  void _listenUserName() {
-    FirebaseFirestore.instance.collection('users').doc(uid).snapshots().listen((
-      snapshot,
-    ) {
-      final data = snapshot.data() as Map<String, dynamic>?;
-      userName.value = data?['name'] ?? '';
-    });
+  // make a public method to re-init listeners
+  void listenUserName() {
+    _userSub.cancel(); // cancel old subscription if any
+    _listenUserName(); // call private method
   }
 
+  void listenGroceryLists() {
+    _listsSub.cancel(); // cancel old subscription if any
+    _listenGroceryLists();
+  }
+
+  void resetData() {
+    userName.value = '';
+    lists.clear();
+    completedCount.value = 0;
+    incompleteCount.value = 0;
+  }
+
+  void resetAndListen() {
+    resetData();
+    listenUserName();
+    listenGroceryLists();
+  }
+
+  void _listenUserName() {
+    _userSub = FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .snapshots()
+        .listen((snapshot) {
+          final data = snapshot.data() as Map<String, dynamic>?;
+          userName.value = data?['name'] ?? '';
+        });
+  }
 
   void changeTab(int index) {
     if (index == 1) {
@@ -43,7 +70,7 @@ class HomeController extends GetxController {
   }
 
   void _listenGroceryLists() {
-    FirebaseFirestore.instance
+    _listsSub = FirebaseFirestore.instance
         .collection('grocery_lists')
         .where('members', arrayContains: uid)
         .snapshots()
@@ -51,6 +78,11 @@ class HomeController extends GetxController {
           lists.value = snapshot.docs;
           _updateProgress();
         });
+  }
+
+  void cancelUserListener() {
+    _userSub.cancel();
+    _listsSub.cancel();
   }
 
   void _updateProgress() {
@@ -78,6 +110,7 @@ class HomeController extends GetxController {
     await FirebaseFirestore.instance.collection('users').doc(uid).update({
       'name': newName,
     });
+    userName.value = newName;
   }
 
   Future<void> createList(String name) async {
@@ -155,7 +188,7 @@ class HomeController extends GetxController {
         .update({
           "members": FieldValue.arrayUnion([uidToAdd]),
         });
-
+    Get.back();
     Get.snackbar(
       "Success",
       "$email added to the list",

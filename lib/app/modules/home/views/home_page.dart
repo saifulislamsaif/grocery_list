@@ -1,6 +1,8 @@
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controller/AuthController.dart';
+import '../../invitation/views/invitation_view.dart';
 import '../controllers/home_controller.dart';
 import 'list_details_page.dart';
 
@@ -20,31 +22,30 @@ class HomePage extends StatelessWidget {
         appBar: AppBar(
           titleSpacing: 0,
           backgroundColor: Colors.green[50],
-          leadingWidth: 60,
-          leading: Obx(() {
-            final firstLetter = controller.userName.value.isNotEmpty
-                ? controller.userName.toUpperCase()
-                : '?';
-            return Padding(
-              padding: const EdgeInsets.all(0.0),
-              child: GestureDetector(
-                onTap: () {
-                  _showEditNameDialog(context);
-                },
-                child: CircleAvatar(
-                  backgroundColor: Colors.grey,
-                  child: Text(
-                    firstLetter,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
+          leadingWidth: 60,          leading: Obx(() {
+          final name = controller.userName.value.trim();
+          final user = name.isNotEmpty ? name.toUpperCase() : '?';
+          return Padding(
+            padding: const EdgeInsets.all(0.0),
+            child: GestureDetector(
+              onTap: () {
+                _showEditNameDialog(context);
+              },
+              child: CircleAvatar(
+                backgroundColor: Colors.grey,
+                child: Text(
+                  user,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
                   ),
                 ),
               ),
-            );
-          }),
+            ),
+          );
+        }),
+
           title: const Text("Grocery Lists"),
           centerTitle: true,
           actions: [
