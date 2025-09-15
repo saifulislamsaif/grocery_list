@@ -63,6 +63,8 @@ class HomePage extends StatelessWidget {
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
+          backgroundColor:Colors.green[100],
+          elevation: 50,
           currentIndex: index,
           onTap: (i) {
             if (i == 1) {
@@ -219,18 +221,72 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // ------------------- Status ট্যাব -------------------
+
   Widget _buildStatusPage() {
-    return Obx(
-      () => Center(
-        child: Text(
-          "Completed: ${controller.completedCount.value}\nIncomplete: ${controller.incompleteCount.value}",
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 20),
-        ),
-      ),
-    );
+    return Obx(() {
+      // completed ও incomplete আলাদা লিস্ট
+      final completedLists = controller.lists
+          .where((doc) => (doc.data() as Map<String, dynamic>)['completed'] == true)
+          .toList();
+
+      final incompleteLists = controller.lists
+          .where((doc) => (doc.data() as Map<String, dynamic>)['completed'] != true)
+          .toList();
+
+      return ListView(
+        padding: const EdgeInsets.all(12),
+        children: [
+          Text(
+            "Completed (${completedLists.length})",
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          if (completedLists.isEmpty)
+            const Text("No completed lists"),
+          ...completedLists.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            final name = data["name"] ?? "Unnamed List";
+            return Card(
+              color: Colors.green[100],
+              child: ListTile(
+                title: Text(name),
+                trailing: const Icon(Icons.check_circle, color: Colors.green),
+                onTap: () {
+                  Get.to(() => ListDetailsPage(listId: doc.id, listName: name));
+                },
+              ),
+            );
+          }),
+
+          const SizedBox(height: 24),
+
+          // ✅ Incomplete Section
+          Text(
+            "Incomplete (${incompleteLists.length})",
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          if (incompleteLists.isEmpty)
+            const Text("No incomplete lists"),
+          ...incompleteLists.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            final name = data["name"] ?? "Unnamed List";
+            return Card(
+              color: Colors.red[100],
+              child: ListTile(
+                title: Text(name),
+                trailing: const Icon(Icons.close, color: Colors.red),
+                onTap: () {
+                  Get.to(() => ListDetailsPage(listId: doc.id, listName: name));
+                },
+              ),
+            );
+          }),
+        ],
+      );
+    });
   }
+
 
   void _showCreateListDialog(BuildContext context) {
     final TextEditingController controllerText = TextEditingController();
