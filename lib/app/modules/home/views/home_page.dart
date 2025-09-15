@@ -63,7 +63,7 @@ class HomePage extends StatelessWidget {
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
-          backgroundColor:Colors.green[100],
+          backgroundColor: Colors.green[100],
           elevation: 50,
           currentIndex: index,
           onTap: (i) {
@@ -221,52 +221,30 @@ class HomePage extends StatelessWidget {
     );
   }
 
-
   Widget _buildStatusPage() {
     return Obx(() {
       // completed ও incomplete আলাদা লিস্ট
       final completedLists = controller.lists
-          .where((doc) => (doc.data() as Map<String, dynamic>)['completed'] == true)
+          .where(
+            (doc) => (doc.data() as Map<String, dynamic>)['completed'] == true,
+          )
           .toList();
 
       final incompleteLists = controller.lists
-          .where((doc) => (doc.data() as Map<String, dynamic>)['completed'] != true)
+          .where(
+            (doc) => (doc.data() as Map<String, dynamic>)['completed'] != true,
+          )
           .toList();
 
       return ListView(
         padding: const EdgeInsets.all(12),
         children: [
           Text(
-            "Completed (${completedLists.length})",
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          if (completedLists.isEmpty)
-            const Text("No completed lists"),
-          ...completedLists.map((doc) {
-            final data = doc.data() as Map<String, dynamic>;
-            final name = data["name"] ?? "Unnamed List";
-            return Card(
-              color: Colors.green[100],
-              child: ListTile(
-                title: Text(name),
-                trailing: const Icon(Icons.check_circle, color: Colors.green),
-                onTap: () {
-                  Get.to(() => ListDetailsPage(listId: doc.id, listName: name));
-                },
-              ),
-            );
-          }),
-
-          const SizedBox(height: 24),
-
-          Text(
             "Uncompleted (${incompleteLists.length})",
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          if (incompleteLists.isEmpty)
-            const Text("No Uncompleted lists"),
+          if (incompleteLists.isEmpty) const Text("No Uncompleted lists"),
           ...incompleteLists.map((doc) {
             final data = doc.data() as Map<String, dynamic>;
             final name = data["name"] ?? "Unnamed List";
@@ -281,11 +259,31 @@ class HomePage extends StatelessWidget {
               ),
             );
           }),
+          const SizedBox(height: 24),
+          Text(
+            "Completed (${completedLists.length})",
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          if (completedLists.isEmpty) const Text("No completed lists"),
+          ...completedLists.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            final name = data["name"] ?? "Unnamed List";
+            return Card(
+              color: Colors.green[100],
+              child: ListTile(
+                title: Text(name),
+                trailing: const Icon(Icons.check_circle, color: Colors.green),
+                onTap: () {
+                  Get.to(() => ListDetailsPage(listId: doc.id, listName: name));
+                },
+              ),
+            );
+          }),
         ],
       );
     });
   }
-
 
   void _showCreateListDialog(BuildContext context) {
     final TextEditingController controllerText = TextEditingController();
