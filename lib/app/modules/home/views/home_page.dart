@@ -127,7 +127,7 @@ class HomePage extends StatelessWidget {
               const SizedBox(height: 8),
               Obx(
                 () => Text(
-                  "Completed: ${controller.completedCount.value} | Incomplete: ${controller.incompleteCount.value}",
+                  "Completed: ${controller.completedCount.value} | Uncompleted: ${controller.incompleteCount.value}",
                   style: const TextStyle(color: Colors.white),
                 ),
               ),
@@ -260,14 +260,13 @@ class HomePage extends StatelessWidget {
 
           const SizedBox(height: 24),
 
-          // ✅ Incomplete Section
           Text(
-            "Incomplete (${incompleteLists.length})",
+            "Uncompleted (${incompleteLists.length})",
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           if (incompleteLists.isEmpty)
-            const Text("No incomplete lists"),
+            const Text("No Uncompleted lists"),
           ...incompleteLists.map((doc) {
             final data = doc.data() as Map<String, dynamic>;
             final name = data["name"] ?? "Unnamed List";
