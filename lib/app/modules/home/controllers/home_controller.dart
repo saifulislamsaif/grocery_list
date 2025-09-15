@@ -2,8 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-
-import '../../../controller/AuthController.dart';
+import '../../signup/controllers/AuthController.dart';
 
 class HomeController extends GetxController {
   final AuthController authController = Get.find();
@@ -27,7 +26,6 @@ class HomeController extends GetxController {
     }
   }
 
-  // make a public method to re-init listeners
   void listenUserName() {
     _userSub.cancel(); // cancel old subscription if any
     _listenUserName(); // call private method
@@ -57,7 +55,7 @@ class HomeController extends GetxController {
         .doc(uid)
         .snapshots()
         .listen((snapshot) {
-          final data = snapshot.data() as Map<String, dynamic>?;
+          final data = snapshot.data();
           userName.value = data?['name'] ?? '';
         });
   }

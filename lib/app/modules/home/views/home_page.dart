@@ -1,8 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../controller/AuthController.dart';
-import '../../invitation/views/invitation_view.dart';
+import '../../signup/controllers/AuthController.dart';
 import '../controllers/home_controller.dart';
 import 'list_details_page.dart';
 
@@ -224,7 +223,6 @@ class HomePage extends StatelessWidget {
 
   Widget _buildStatusPage() {
     return Obx(() {
-      // completed ও incomplete আলাদা লিস্ট
       final completedLists = controller.lists
           .where(
             (doc) => (doc.data() as Map<String, dynamic>)['completed'] == true,

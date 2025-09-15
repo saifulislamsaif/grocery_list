@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:grocerry_list/app/modules/home/views/home_page.dart';
-import '../../../controller/AuthController.dart';
+import '../controllers/AuthController.dart';
 
 
 class SignUpPage extends StatelessWidget {

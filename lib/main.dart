@@ -2,8 +2,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
-import 'app/controller/AuthController.dart';
-import 'app/modules/home/views/LoginPage.dart';
+import 'app/modules/signup/controllers/AuthController.dart';
+import 'app/modules/signup/views/LoginPage.dart';
 import 'app/modules/home/views/home_page.dart';
 import 'firebase_options.dart';
 

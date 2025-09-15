@@ -1,10 +1,9 @@
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import '../modules/home/controllers/home_controller.dart';
-import '../modules/home/views/LoginPage.dart';
-import '../modules/home/views/home_page.dart';
+import '../../home/controllers/home_controller.dart';
+import '../views/LoginPage.dart';
+import '../../home/views/home_page.dart';
 
 class AuthController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -24,7 +23,9 @@ class AuthController extends GetxController {
   Future<void> signUp(String name, String email, String password) async {
     try {
       UserCredential cred = await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
+        email: email,
+        password: password,
+      );
       User? user = cred.user;
 
       if (user != null) {
@@ -35,25 +36,32 @@ class AuthController extends GetxController {
         });
       }
     } catch (e) {
-      Get.snackbar("Error", e.toString(),
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar("Error", e.toString(), snackPosition: SnackPosition.BOTTOM);
     }
   }
 
   Future<void> login(String email, String password) async {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
-      Get.snackbar("Success", "Logged in successfully", snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        "Success",
+        "Logged in successfully",
+        snackPosition: SnackPosition.BOTTOM,
+      );
 
       // Optional: after login, navigate to HomePage
       Get.offAll(() => HomePage());
 
       // Optional: initialize HomeController data for new user
       final homeController = Get.find<HomeController>();
-      homeController.resetAndListen(); // <-- you can define this in HomeController
-
+      homeController
+          .resetAndListen(); // <-- you can define this in HomeController
     } on FirebaseAuthException catch (e) {
-      Get.snackbar("Error", e.message ?? "Login failed", snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        "Error",
+        e.message ?? "Login failed",
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 
@@ -75,23 +83,15 @@ class AuthController extends GetxController {
     homeController.listenGroceryLists();
   }
 
-
   // Logout
   void logout() async {
     await FirebaseAuth.instance.signOut();
-
-    // Reset HomeController data
     final homeController = Get.find<HomeController>();
     homeController.userName.value = '';
     homeController.lists.clear();
     homeController.completedCount.value = 0;
     homeController.incompleteCount.value = 0;
-
-    // Cancel old user subscription
     homeController.cancelUserListener();
-
-    // Navigate to login page
     Get.offAll(() => LoginPage());
   }
-
 }
