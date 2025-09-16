@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../signup/controllers/AuthController.dart';
@@ -20,30 +19,32 @@ class HomePage extends StatelessWidget {
         backgroundColor: Colors.green[50],
         appBar: AppBar(
           titleSpacing: 0,
+          surfaceTintColor: Colors.white70,
           backgroundColor: Colors.green[50],
-          leadingWidth: 60,          leading: Obx(() {
-          final name = controller.userName.value.trim();
-          final user = name.isNotEmpty ? name.toUpperCase() : '?';
-          return Padding(
-            padding: const EdgeInsets.all(0.0),
-            child: GestureDetector(
-              onTap: () {
-                _showEditNameDialog(context);
-              },
-              child: CircleAvatar(
-                backgroundColor: Colors.grey,
-                child: Text(
-                  user,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
+          leadingWidth: 60,
+          leading: Obx(() {
+            final name = controller.userName.value.trim();
+            final user = name.isNotEmpty ? name.toUpperCase() : '?';
+            return Padding(
+              padding: const EdgeInsets.all(0.0),
+              child: GestureDetector(
+                onTap: () {
+                  _showEditNameDialog(context);
+                },
+                child: CircleAvatar(
+                  backgroundColor: Colors.grey,
+                  child: Text(
+                    user,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        }),
+            );
+          }),
 
           title: const Text("Grocery Lists"),
           centerTitle: true,
@@ -111,7 +112,9 @@ class HomePage extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          gradient: const LinearGradient(colors: [Colors.grey, Colors.grey]),
+          gradient: const LinearGradient(
+            colors: [Colors.cyan, Colors.cyanAccent],
+          ),
         ),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -122,7 +125,7 @@ class HomePage extends StatelessWidget {
                 "Overview",
                 style: Theme.of(
                   context,
-                ).textTheme.titleLarge?.copyWith(color: Colors.white),
+                ).textTheme.titleLarge?.copyWith(color: Colors.black),
               ),
               const SizedBox(height: 8),
               Obx(
@@ -159,60 +162,73 @@ class HomePage extends StatelessWidget {
         final percent = itemsCount == 0 ? 0.0 : purchasedCount / itemsCount;
 
         return Card(
-          color: Colors.grey[600],
           margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(8), // এখানে 8
           ),
-          elevation: 6,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(16),
-            onTap: () {
-              Get.to(() => ListDetailsPage(listId: doc.id, listName: name));
-            },
-            onLongPress: () {
-              if (data["ownerId"] == controller.uid) {
-                _showOwnerActions(context, doc.id, name);
-              }
-            },
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Colors.green, Colors.blue],
+                begin: FractionalOffset(0.0, 0.0),
+                end: FractionalOffset(1.0, 0.0),
+                stops: [0.0, 1.0],
+                tileMode: TileMode.clamp,
+              ),
+              borderRadius: BorderRadius.circular(8), // Container-এও 8 দিতে হবে
+            ),
             child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          name,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          "$purchasedCount of $itemsCount items purchased",
-                          style: const TextStyle(color: Colors.white70),
-                        ),
-                        const SizedBox(height: 6),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
-                          child: LinearProgressIndicator(
-                            value: percent,
-                            minHeight: 6,
-                            backgroundColor: Colors.white24,
-                            valueColor: const AlwaysStoppedAnimation<Color>(
-                              Colors.white,
+              padding: const EdgeInsets.all(8.0),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(8), // InkWell-এও 8
+                onTap: () {
+                  Get.to(() => ListDetailsPage(listId: doc.id, listName: name));
+                },
+                onLongPress: () {
+                  if (data["ownerId"] == controller.uid) {
+                    _showOwnerActions(context, doc.id, name);
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              name,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
+                            const SizedBox(height: 6),
+                            Text(
+                              "$purchasedCount of $itemsCount items purchased",
+                              style: const TextStyle(color: Colors.white70),
+                            ),
+                            const SizedBox(height: 6),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: percent,
+                                minHeight: 6,
+                                backgroundColor: Colors.white24,
+                                valueColor: const AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                      const Icon(Icons.arrow_forward_ios, color: Colors.white),
+                    ],
                   ),
-                  const Icon(Icons.arrow_forward_ios, color: Colors.white),
-                ],
+                ),
               ),
             ),
           ),
@@ -317,6 +333,7 @@ class HomePage extends StatelessWidget {
     Get.dialog(
       AlertDialog(
         title: const Text("Edit Name"),
+        backgroundColor: Colors.white,
         content: TextField(
           controller: controllerText,
           decoration: const InputDecoration(hintText: "Enter new name"),
