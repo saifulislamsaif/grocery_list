@@ -24,7 +24,7 @@ class HomePage extends StatelessWidget {
           leadingWidth: 60,
           leading: Obx(() {
             final name = controller.userName.value.trim();
-            final user = name.isNotEmpty ? name.toUpperCase() : '?';
+            final user = name.isNotEmpty ? name[0].toUpperCase() : '?';
             return Padding(
               padding: const EdgeInsets.all(0.0),
               child: GestureDetector(
@@ -32,7 +32,7 @@ class HomePage extends StatelessWidget {
                   _showEditNameDialog(context);
                 },
                 child: CircleAvatar(
-                  backgroundColor: Colors.grey,
+                  backgroundColor: Colors.greenAccent,
                   child: Text(
                     user,
                     style: const TextStyle(
@@ -163,9 +163,7 @@ class HomePage extends StatelessWidget {
 
         return Card(
           margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8), // এখানে 8
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           child: Container(
             decoration: BoxDecoration(
               gradient: const LinearGradient(
