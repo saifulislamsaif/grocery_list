@@ -16,25 +16,31 @@ class HomePage extends StatelessWidget {
     return Obx(() {
       final index = navController.selectedIndex.value;
       return Scaffold(
+        backgroundColor: Colors.green[50],appBar: AppBar(
         backgroundColor: Colors.green[50],
-        appBar: AppBar(
-          titleSpacing: 0,
-          surfaceTintColor: Colors.white70,
-          backgroundColor: Colors.green[50],
-          leadingWidth: 60,
-          leading: Obx(() {
-            final name = controller.userName.value.trim();
-            final user = name.isNotEmpty ? name[0].toUpperCase() : '?';
-            return Padding(
-              padding: const EdgeInsets.all(0.0),
-              child: GestureDetector(
-                onTap: () {
-                  _showEditNameDialog(context);
-                },
-                child: CircleAvatar(
+        leadingWidth: 180, // ডানদিকে জায়গা বাড়ালাম
+        leading: Obx(() {
+          final name = controller.userName.value.trim();
+          final firstLetter = name.isNotEmpty ? name[0].toUpperCase() : '?';
+          final hour = DateTime.now().hour;
+          String greeting;
+          if (hour < 12) {
+            greeting = 'Good Morning';
+          } else if (hour < 17) {
+            greeting = 'Good Afternoon';
+          } else {
+            greeting = 'Good Evening';
+          }
+
+          return GestureDetector(
+            onTap: () => _showEditNameDialog(context),
+            child: Row(
+              children: [
+                const SizedBox(width: 8),
+                CircleAvatar(
                   backgroundColor: Colors.greenAccent,
                   child: Text(
-                    user,
+                    firstLetter,
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -42,19 +48,41 @@ class HomePage extends StatelessWidget {
                     ),
                   ),
                 ),
-              ),
-            );
-          }),
 
-          title: const Text("Grocery Lists"),
-          centerTitle: true,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.logout),
-              onPressed: () => authController.logout(),
+                const SizedBox(width: 8),
+
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name.isNotEmpty ? name : 'Guest',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    Text(
+                      greeting,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        }),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => authController.logout(),
+          ),
+        ],
+      ),
         body: IndexedStack(
           index: index,
           children: [
