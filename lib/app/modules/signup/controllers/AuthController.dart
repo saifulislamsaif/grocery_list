@@ -12,6 +12,9 @@ class AuthController extends GetxController {
   Rx<User?> firebaseUser = Rx<User?>(null);
 
   User? get user => firebaseUser.value;
+  var isLoading = false.obs;
+  var errorMessage = ''.obs;
+
 
   @override
   void onInit() {

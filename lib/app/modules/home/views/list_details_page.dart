@@ -58,7 +58,6 @@ class ListDetailsPage extends StatelessWidget {
                 value: purchased,
                 onChanged: (val) async {
                   await doc.reference.update({"purchased": val});
-                  // 🔄 Update counters in parent list
                   await _updateCounters(listId);
                 },
                 secondary: IconButton(
@@ -89,6 +88,7 @@ class ListDetailsPage extends StatelessWidget {
       context: context,
       builder: (_) => AlertDialog(
         title: const Text("Add Item"),
+        backgroundColor: Colors.green[100],
         content: TextField(
           controller: controller,
           decoration: const InputDecoration(hintText: "Item name"),

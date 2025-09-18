@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:grocerry_list/app/modules/home/views/home_page.dart';
 import '../controllers/AuthController.dart';
 
-
 class SignUpPage extends StatelessWidget {
   SignUpPage({super.key});
 
@@ -26,16 +25,31 @@ class SignUpPage extends StatelessWidget {
           children: [
             TextField(
               controller: nameController,
-              decoration: const InputDecoration(labelText: "Name"),
+              decoration: const InputDecoration(
+                labelText: "Name",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                )
+              ),
             ),
+            const SizedBox(height: 10),
             TextField(
               controller: emailController,
-              decoration: const InputDecoration(labelText: "Email"),
+              decoration: const InputDecoration(labelText: "Email",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                )
+              ),
             ),
+            const SizedBox(height: 10),
             TextField(
               controller: passwordController,
               obscureText: true,
-              decoration: const InputDecoration(labelText: "Password"),
+              decoration: const InputDecoration(labelText: "Password",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                )
+              ),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
@@ -46,7 +60,7 @@ class SignUpPage extends StatelessWidget {
                   passwordController.text,
                 );
                 Get.offAll(
-                  () =>  HomePage(),
+                  () => HomePage(),
                 ); // Sign up done → redirect to login
               },
               child: const Text("Sign Up"),

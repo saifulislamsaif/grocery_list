@@ -183,7 +183,7 @@ class HomePage extends StatelessWidget {
                   Get.to(() => ListDetailsPage(listId: doc.id, listName: name));
                 },
                 onLongPress: () {
-                  if (data["ownerId"] == controller.uid) {
+                  if (data["ownerId"] == controller.uid && itemsCount == purchasedCount) {
                     _showOwnerActions(context, doc.id, name);
                   }
                 },
@@ -283,7 +283,7 @@ class HomePage extends StatelessWidget {
             final data = doc.data() as Map<String, dynamic>;
             final name = data["name"] ?? "Unnamed List";
             return Card(
-              color: Colors.green[100],
+              color: Colors.white,
               child: ListTile(
                 title: Text(name),
                 trailing: const Icon(Icons.check_circle, color: Colors.green),
@@ -303,6 +303,7 @@ class HomePage extends StatelessWidget {
     Get.dialog(
       AlertDialog(
         title: const Text("Create New List"),
+        backgroundColor: Colors.green[100],
         content: TextField(
           controller: controllerText,
           decoration: const InputDecoration(hintText: "List name"),
@@ -331,7 +332,7 @@ class HomePage extends StatelessWidget {
     Get.dialog(
       AlertDialog(
         title: const Text("Edit Name"),
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.green[100],
         content: TextField(
           controller: controllerText,
           decoration: const InputDecoration(hintText: "Enter new name"),
@@ -360,7 +361,7 @@ class HomePage extends StatelessWidget {
 
   void _showOwnerActions(BuildContext context, String listId, String name) {
     Get.bottomSheet(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Colors.green[100],
       Wrap(
         children: [
           ListTile(
