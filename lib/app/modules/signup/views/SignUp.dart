@@ -29,7 +29,8 @@ class SignUpPage extends StatelessWidget {
       backgroundColor: Colors.white,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        backgroundColor: Colors.transparent
       ),
       body: SafeArea(
         child: SingleChildScrollView(
