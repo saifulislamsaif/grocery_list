@@ -49,12 +49,12 @@ flutter_native_splash:
   ios: true
   color: "#D64415"
   color_dark: "#121212"
-  image: assets/images/splash_grocery.png
+  image: assets/images/splash_1100.png
 
 
   android_12:
     color: "#D64151"
-    image: assets/images/ic_lunch.png
+    image: assets/images/splash_512.png
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -73,6 +73,7 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     - assets/images/bg.png
+    - assets/images/login_bg.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

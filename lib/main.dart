@@ -37,7 +37,7 @@ class Root extends StatelessWidget {
       if (authController.user != null) {
         return  HomePage();
       } else {
-        return const LoginPage();
+        return  LoginPage();
       }
     });
   }
