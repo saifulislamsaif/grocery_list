@@ -52,10 +52,10 @@ class AuthController extends GetxController {
         snackPosition: SnackPosition.BOTTOM,
       );
 
-      // Optional: after login, navigate to HomePage
+
       Get.offAll(() => HomePage());
 
-      // Optional: initialize HomeController data for new user
+
       final homeController = Get.find<HomeController>();
       homeController
           .resetAndListen(); // <-- you can define this in HomeController
@@ -75,18 +75,18 @@ class AuthController extends GetxController {
     // Cancel any previous listeners
     homeController.cancelUserListener();
 
-    // Reset variables
+
     homeController.userName.value = '';
     homeController.lists.clear();
     homeController.completedCount.value = 0;
     homeController.incompleteCount.value = 0;
 
-    // Re-listen for new user
+
     homeController.listenUserName();
     homeController.listenGroceryLists();
   }
 
-  // Logout
+
   void logout() async {
     await FirebaseAuth.instance.signOut();
     final homeController = Get.find<HomeController>();
