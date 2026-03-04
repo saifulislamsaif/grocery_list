@@ -213,11 +213,17 @@ class ListDetailsPage extends StatelessWidget {
                   final itemQty = qtyCtrl.text.trim();
 
                   if (itemName.isNotEmpty) {
-                    // Call the logic method
-                    await _addItemToFirestore(name: itemName, quantity: itemQty);
+                    try {
+                      await _addItemToFirestore(
+                        name: itemName,
+                        quantity: itemQty,
+                      );
 
-                    // Dismiss the bottom sheet
-                    Get.back();
+                      Navigator.of(Get.context!).pop(); // Always works
+
+                    } catch (e) {
+                      debugPrint("Add failed: $e");
+                    }
                   }
                 },
                 child: const Text("Add to List", style: TextStyle(color: Colors.white, fontSize: 16)),

@@ -62,7 +62,7 @@ class HomePage extends StatelessWidget {
               padding: const EdgeInsets.only(right: 16.0, top: 8, bottom: 8),
               child: ElevatedButton.icon(
                 onPressed: () {
-                  // Add your "New List" logic here
+                  _showCreateListBottomSheet(context);
                 },
                 icon: const Icon(Icons.add, size: 18, color: Colors.white),
                 label: const Text(
@@ -95,6 +95,108 @@ class HomePage extends StatelessWidget {
       );
     });
   }
+  void _showCreateListBottomSheet(BuildContext context) {
+    final TextEditingController nameController = TextEditingController();
+
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            /// Drag Handle
+            Center(
+              child: Container(
+                height: 5,
+                width: 40,
+                margin: const EdgeInsets.only(bottom: 20),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+
+            /// Title
+            const Center(
+              child: Text(
+                "Create New List",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            /// List Name Field
+            TextField(
+              controller: nameController,
+              decoration: InputDecoration(
+                hintText: "List name (e.g. Weekly Groceries)",
+                contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Color(0xFF007953)),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            /// Create Button
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF007953),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                onPressed: () async {
+                  final name = nameController.text.trim();
+
+                  if (name.isEmpty) {
+                    Get.snackbar(
+                      "Error",
+                      "Please enter a list name",
+                      snackPosition: SnackPosition.BOTTOM,
+                    );
+                    return;
+                  }
+
+                  await controller.createList(name);
+
+                  Get.back(); // Close sheet
+
+                  Get.snackbar(
+                    "Success",
+                    "List created successfully",
+                    snackPosition: SnackPosition.BOTTOM,
+                  );
+                },
+                child: const Text(
+                  "Create List",
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
 
   Widget _historyView(BuildContext context) {
     final completedLists = controller.lists
@@ -106,7 +208,6 @@ class HomePage extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        /// RECENT ACTIVITY TITLE
         const Text(
           "RECENT ACTIVITY",
           style: TextStyle(
@@ -118,7 +219,6 @@ class HomePage extends StatelessWidget {
 
         const SizedBox(height: 12),
 
-        /// Fake activity design (like screenshot)
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -173,7 +273,6 @@ class HomePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /// Title + Archived Badge
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -316,7 +415,6 @@ class HomePage extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    /// Icon Box
                     Container(
                       height: 48,
                       width: 48,
@@ -329,10 +427,7 @@ class HomePage extends StatelessWidget {
                         color: Color(0xFF2E6F55),
                       ),
                     ),
-
-                    const SizedBox(width: 14),
-
-                    /// Title + Date
+                     SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -348,7 +443,7 @@ class HomePage extends StatelessWidget {
                           const SizedBox(height: 4),
 
                           Text(
-                            "Mar 3", // you can format createdAt here
+                            "Mar 3",
                             style: const TextStyle(
                               fontSize: 13,
                               color: Colors.black54,
@@ -383,9 +478,8 @@ class HomePage extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 8),
+                 SizedBox(height: 8),
 
-                /// Progress Bar
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: LinearProgressIndicator(
@@ -400,7 +494,6 @@ class HomePage extends StatelessWidget {
 
                 const SizedBox(height: 14),
 
-                /// Members Row
                 Row(
                   children: [
                     const Icon(
