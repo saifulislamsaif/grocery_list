@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class ListDetailsPage extends StatelessWidget {
   final String listId;
@@ -15,234 +18,246 @@ class ListDetailsPage extends StatelessWidget {
         .doc(listId)
         .collection("items");
 
-    final TextEditingController itemController = TextEditingController();
-
     return Scaffold(
-      backgroundColor: Colors.green[50],
+      backgroundColor: const Color(0xFFF9F9F7), // Light off-white background
       appBar: AppBar(
-        backgroundColor: Colors.green[50],
-        title: Text(listName),
+        backgroundColor: const Color(0xFFF9F9F7),
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(listName, style: const TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.bold)),
+            StreamBuilder<DocumentSnapshot>(
+              stream: FirebaseFirestore.instance.collection("grocery_lists").doc(listId).snapshots(),
+              builder: (context, snapshot) {
+                final data = snapshot.data?.data() as Map<String, dynamic>?;
+                int total = data?['itemsCount'] ?? 0;
+                int done = data?['purchasedCount'] ?? 0;
+                return Text(
+                  "${total - done} remaining · $done done",
+                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                );
+              },
+            ),
+          ],
+        ),
+        actions: [
+          // Simulated Avatar Group
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.grey.shade200),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.group_outlined, size: 18, color: Colors.grey),
+                  const SizedBox(width: 4),
+                  CircleAvatar(radius: 10, backgroundColor: Colors.green[100], child: const Text("S", style: TextStyle(fontSize: 10))),
+                  const SizedBox(width: 4),
+                  const Text("2", style: TextStyle(fontSize: 12, color: Colors.grey)),
+                ],
+              ),
+            ),
+          )
+        ],
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: itemsRef.orderBy("createdAt", descending: false).snapshots(),
         builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return const Center(child: Text("Something went wrong"));
-          }
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
+          if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
 
-          final items = snapshot.data!.docs;
+          final allDocs = snapshot.data!.docs;
+          final toBuy = allDocs.where((d) => !(d['purchased'] ?? false)).toList();
+          final completed = allDocs.where((d) => (d['purchased'] ?? false)).toList();
 
-          if (items.isEmpty) {
-            return const Center(child: Text("No items yet. Add some!"));
-          }
-
-          return ListView.builder(
-            itemCount: items.length,
-            itemBuilder: (context, index) {
-              final doc = items[index];
-              final data = doc.data() as Map<String, dynamic>;
-              final itemName = data["name"] ?? "Unnamed";
-              final purchased = data["purchased"] ?? false;
-
-              return CheckboxListTile(
-                title: Text(
-                  itemName,
-                  style: TextStyle(
-                    decoration:
-                    purchased ? TextDecoration.lineThrough : null,
-                  ),
-                ),
-                value: purchased,
-                onChanged: (val) async {
-                  await doc.reference.update({"purchased": val});
-                  await _updateCounters(listId);
-                },
-                secondary: IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () async {
-                    await doc.reference.delete();
-                    await _updateCounters(listId);
-                  },
-                ),
-              );
-            },
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              if (toBuy.isNotEmpty) ...[
+                _buildSectionHeader("TO BUY (${toBuy.length})"),
+                ...toBuy.map((doc) => _buildListItem(doc, false)),
+              ],
+              const SizedBox(height: 24),
+              if (completed.isNotEmpty) ...[
+                _buildSectionHeader("COMPLETED (${completed.length})"),
+                ...completed.map((doc) => _buildListItem(doc, true)),
+              ],
+            ],
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showCreateListBottomSheet(context);
-        },
-        child: const Icon(Icons.add),
+        backgroundColor: const Color(0xFF006D4E), // Dark Teal from image
+        onPressed: () => _showCreateItemBottomSheet(context),
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
-  void _showCreateListBottomSheet(BuildContext context) {
-    final TextEditingController controllerText = TextEditingController();
+
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12, top: 8),
+      child: Text(
+        title,
+        style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.1),
+      ),
+    );
+  }
+
+  Widget _buildListItem(DocumentSnapshot doc, bool isCompleted) {
+    final data = doc.data() as Map<String, dynamic>;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: isCompleted ? const Color(0xFFF2F2EB) : Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        leading: GestureDetector(
+          onTap: () => _toggleStatus(doc),
+          child: Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isCompleted ? const Color(0xFF006D4E) : Colors.transparent,
+              border: Border.all(color: isCompleted ? const Color(0xFF006D4E) : Colors.grey.shade400, width: 2),
+            ),
+            child: isCompleted ? const Icon(Icons.check, size: 18, color: Colors.white) : null,
+          ),
+        ),
+        title: Text(
+          data['name'] ?? "",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: isCompleted ? Colors.grey[600] : Colors.black87,
+            decoration: isCompleted ? TextDecoration.lineThrough : null,
+          ),
+        ),
+        subtitle: Text(
+          "${data['quantity'] ?? '1'}  ·  by ${data['addedBy'] ?? 'You'}",
+          style: TextStyle(color: Colors.grey[500], fontSize: 13),
+        ),
+        trailing: isCompleted
+            ? const Text("✓ Sarah", style: TextStyle(color: Color(0xFF006D4E), fontSize: 12))
+            : IconButton(icon: const Icon(Icons.delete_outline, size: 20), onPressed: () => doc.reference.delete()),
+      ),
+    );
+  }
+
+  void _toggleStatus(DocumentSnapshot doc) async {
+    final bool current = doc['purchased'] ?? false;
+    await doc.reference.update({"purchased": !current});
+    await _updateCounters(listId);
+  }
+
+  void _showCreateItemBottomSheet(BuildContext context) {
+    final nameCtrl = TextEditingController();
+    final qtyCtrl = TextEditingController();
 
     Get.bottomSheet(
       Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(24),
         decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// Drag Handle
-            Center(
-              child: Container(
-                height: 5,
-                width: 40,
-                margin: const EdgeInsets.only(bottom: 20),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(10),
-                ),
+            // Drag Handle
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(10),
               ),
             ),
-
-            /// Title
-            const Center(
-              child: Text(
-                "Add Item",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-              ),
-            ),
-
-            const SizedBox(height: 6),
-
-            /// Subtitle
-            Center(
-              child: Text(
-                "Add a new item to your list",
-                style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
-              ),
-            ),
-
+            const SizedBox(height: 20),
+            const Text("Add Item", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 20),
 
-            /// TextField
             TextField(
-              controller: controllerText,
-              decoration: InputDecoration(
-                hintText: "Item name",
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Colors.green),
-                ),
-              ),
+                controller: nameCtrl,
+                decoration: InputDecoration(hintText: "Item name", border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)))
             ),
+            const SizedBox(height: 12),
 
-            const SizedBox(height: 20),
-
-            /// TextField
             TextField(
-              controller: controllerText,
-              decoration: InputDecoration(
-                hintText: "Quantity(e.g. 2L, 1 dozen",
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Colors.green),
-                ),
-              ),
+                controller: qtyCtrl,
+                decoration: InputDecoration(hintText: "Quantity (e.g. 10kg, 2 boxes)", border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)))
             ),
+            const SizedBox(height: 24),
 
-            const SizedBox(height: 20),
-
-            /// Add Button
             SizedBox(
               width: double.infinity,
-              height: 48,
+              height: 50,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green[300],
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                  backgroundColor: const Color(0xFF006D4E),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 onPressed: () async {
-                  final name = controllerText.text.trim();
-                  // if (name.isNotEmpty) {
-                  //   await controller.createList(name);
-                  //   Get.back();
-                  // }
+                  final itemName = nameCtrl.text.trim();
+                  final itemQty = qtyCtrl.text.trim();
+
+                  if (itemName.isNotEmpty) {
+                    // Call the logic method
+                    await _addItemToFirestore(name: itemName, quantity: itemQty);
+
+                    // Dismiss the bottom sheet
+                    Get.back();
+                  }
                 },
-                child: const Text("Add Item", style: TextStyle(fontSize: 16)),
+                child: const Text("Add to List", style: TextStyle(color: Colors.white, fontSize: 16)),
               ),
             ),
-
-            const SizedBox(height: 2),
           ],
         ),
       ),
       isScrollControlled: true,
     );
   }
-  void _showAddItemDialog(BuildContext context,
-      CollectionReference<Map<String, dynamic>> itemsRef,
-      TextEditingController controller) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Add Item"),
-        backgroundColor: Colors.green[100],
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(hintText: "Item name"),
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text("Cancel")),
-          TextButton(
-            onPressed: () async {
-              if (controller.text.isNotEmpty) {
-                await itemsRef.add({
-                  "name": controller.text,
-                  "purchased": false,
-                  "createdAt": FieldValue.serverTimestamp(),
-                });
-                controller.clear();
-                await _updateCounters(listId);
-                Get.back();
-              }
-            },
-            child: const Text("Add"),
-          ),
-        ],
-      ),
-    );
+  Future<void> _addItemToFirestore({
+    required String name,
+    required String quantity,
+  }) async {
+    try {
+      // 1. Add the item
+      await FirebaseFirestore.instance
+          .collection("grocery_lists")
+          .doc(listId)
+          .collection("items")
+          .add({
+        "name": name,
+        "quantity": quantity.isEmpty ? "1" : quantity,
+        "purchased": false,
+        "addedBy": "You",
+        "createdAt": FieldValue.serverTimestamp(),
+      });
+
+      // 2. Update the counters
+      await _updateCounters(listId);
+    } catch (e) {
+      debugPrint("Error adding item: $e");
+      Get.snackbar("Error", "Failed to add item");
+    }
   }
-
   Future<void> _updateCounters(String listId) async {
-    final itemsSnapshot = await FirebaseFirestore.instance
-        .collection("grocery_lists")
-        .doc(listId)
-        .collection("items")
-        .get();
-
-    int total = itemsSnapshot.docs.length;
-    int purchased =
-        itemsSnapshot.docs.where((doc) => doc["purchased"] == true).length;
-
+    final items = await FirebaseFirestore.instance.collection("grocery_lists").doc(listId).collection("items").get();
+    int total = items.docs.length;
+    int purchased = items.docs.where((doc) => doc["purchased"] == true).length;
     await FirebaseFirestore.instance.collection("grocery_lists").doc(listId).update({
       "itemsCount": total,
       "purchasedCount": purchased,
