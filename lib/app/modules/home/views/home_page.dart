@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import '../../signup/controllers/AuthController.dart';
 import '../controllers/home_controller.dart';
 import 'list_details_page.dart';
@@ -16,71 +17,67 @@ class HomePage extends StatelessWidget {
     return Obx(() {
       final index = navController.selectedIndex.value;
       return Scaffold(
-        backgroundColor: Colors.green[50],
+        backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: Colors.green[50],
-          leadingWidth: 180,
-          leading: Obx(() {
-            final name = controller.userName.value.trim();
-            final firstLetter = name.isNotEmpty ? name[0].toUpperCase() : '?';
-            final hour = DateTime.now().hour;
-            String greeting;
-            if (hour < 12) {
-              greeting = 'Good Morning';
-            } else if (hour < 17) {
-              greeting = 'Good Afternoon';
-            } else {
-              greeting = 'Good Evening';
-            }
-
-            return GestureDetector(
-              onTap: () => _showEditNameDialog(context),
-              child: Row(
-                children: [
-                  const SizedBox(width: 8),
-                  CircleAvatar(
-                    backgroundColor: Color(0xbb4aa177),
-                    child: Text(
-                      firstLetter,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
+          backgroundColor: const Color(0xFFF7F6F2), // Matches the off-white background
+          elevation: 0,
+          leadingWidth: 200, // Increased to fit the logo and text comfortably
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 16.0),
+            child: Row(
+              children: [
+                // Rounded Square Icon
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF007953), // Deep green from image
+                    borderRadius: BorderRadius.circular(12),
                   ),
-
-                  const SizedBox(width: 8),
-
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        name.isNotEmpty ? name : 'Guest',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      Text(
-                        greeting,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.black54,
-                        ),
-                      ),
-                    ],
+                  child: Image.asset(
+                    height: 20,
+                    width: 20,
+                    'assets/images/leaf_rounded.png',
+                    fit: BoxFit.contain,
                   ),
-                ],
-              ),
-            );
-          }),
+                ),
+                const SizedBox(width: 12),
+                // App Title
+                const Text(
+                  'Grocerly',
+                  style: TextStyle(
+                    color: Color(0xFF1B2E28),
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900, // Extra bold to match the image
+                    letterSpacing: -0.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.logout),
-              onPressed: () => authController.logout(),
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0, top: 8, bottom: 8),
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  // Add your "New List" logic here
+                },
+                icon: const Icon(Icons.add, size: 18, color: Colors.white),
+                label: const Text(
+                  "New List",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF007953), // Deep green
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                ),
+              ),
             ),
           ],
         ),
@@ -88,31 +85,8 @@ class HomePage extends StatelessWidget {
           index: index,
           children: [
             _buildHomeContent(context),
-            const SizedBox(),
+            SizedBox(),
             _buildStatusPage(),
-          ],
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: Colors.green[100],
-          elevation: 50,
-          currentIndex: index,
-          onTap: (i) {
-            if (i == 1) {
-              _showCreateListDialog(context);
-            } else {
-              navController.changeTab(i);
-            }
-          },
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.add_box),
-              label: 'Add List',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.check_circle),
-              label: 'Status',
-            ),
           ],
         ),
       );
@@ -122,149 +96,182 @@ class HomePage extends StatelessWidget {
   Widget _buildHomeContent(BuildContext context) {
     return Obx(() {
       if (controller.lists.isEmpty) {
-        return const Center(child: Text("No grocery lists yet"));
+        return Center(child: Text("No grocery lists yet"));
       }
       return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _overviewCard(context),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: OrderToggleSwitch(),
+          ),
           Expanded(child: _listsView(context)),
         ],
       );
     });
   }
-
-  Widget _overviewCard(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.all(12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 6,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: const LinearGradient(
-            colors: [Color(0xbb4aa177), Color(0xbb4aa177)],
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Overview",
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(color: Colors.black),
-              ),
-              const SizedBox(height: 8),
-              Obx(
-                () => Text(
-                  "Completed: ${controller.completedCount.value} | Uncompleted: ${controller.incompleteCount.value}",
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Obx(
-                () => LinearProgressIndicator(
-                  value: controller.progress,
-                  minHeight: 8,
-                  backgroundColor: Colors.white24,
-                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _listsView(BuildContext context) {
     return ListView.builder(
+      padding: const EdgeInsets.all(16),
       itemCount: controller.lists.length,
       itemBuilder: (context, index) {
         final doc = controller.lists[index];
         final data = doc.data() as Map<String, dynamic>;
+
         final name = data["name"] ?? "Unnamed List";
         final itemsCount = data["itemsCount"] ?? 0;
         final purchasedCount = data["purchasedCount"] ?? 0;
-        final percent = itemsCount == 0 ? 0.0 : purchasedCount / itemsCount;
 
-        return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        final percent =
+        itemsCount == 0 ? 0.0 : purchasedCount / itemsCount;
+
+        return GestureDetector(
+          onTap: () {
+            Get.to(() => ListDetailsPage(
+              listId: doc.id,
+              listName: name,
+            ));
+          },
           child: Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xbb4f8063), Color(0xbb818885),],
-                begin: FractionalOffset(0.0, 0.0),
-                end: FractionalOffset(1.0, 0.0),
-                stops: [0.0, 1.0],
-                tileMode: TileMode.clamp,
-              ),
-              borderRadius: BorderRadius.circular(8), // Container-এও 8 দিতে হবে
+              color: const Color(0xFFF1F4F2),
+              borderRadius: BorderRadius.circular(20),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(8), // InkWell-এও 8
-                onTap: () {
-                  Get.to(() => ListDetailsPage(listId: doc.id, listName: name));
-                },
-                onLongPress: () {
-                  if (data["ownerId"] == controller.uid &&
-                      itemsCount == purchasedCount) {
-                    _showOwnerActions(context, doc.id, name);
-                  }
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              name,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              "$purchasedCount of $itemsCount items purchased",
-                              style: const TextStyle(color: Colors.white70),
-                            ),
-                            const SizedBox(height: 6),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(4),
-                              child: LinearProgressIndicator(
-                                value: percent,
-                                minHeight: 6,
-                                backgroundColor: Colors.white24,
-                                valueColor: const AlwaysStoppedAnimation<Color>(
-                                  Colors.white,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+
+                /// Top Row
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+
+                    /// Icon Box
+                    Container(
+                      height: 48,
+                      width: 48,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFDCE9E2),
+                        borderRadius: BorderRadius.circular(14),
                       ),
-                      const Icon(Icons.arrow_forward_ios, color: Colors.white),
-                    ],
+                      child: const Icon(
+                        Icons.shopping_cart_outlined,
+                        color: Color(0xFF2E6F55),
+                      ),
+                    ),
+
+                    const SizedBox(width: 14),
+
+                    /// Title + Date
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+
+                          Text(
+                            name,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+
+                          const SizedBox(height: 4),
+
+                          Text(
+                            "Mar 3", // you can format createdAt here
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Colors.black54,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                /// Progress Text Row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "$purchasedCount of $itemsCount items",
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    Text(
+                      "${(percent * 100).toInt()}%",
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 8),
+
+                /// Progress Bar
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: LinearProgressIndicator(
+                    value: percent,
+                    minHeight: 6,
+                    backgroundColor: Colors.grey.shade300,
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      Color(0xFF2E6F55),
+                    ),
                   ),
                 ),
-              ),
+
+                const SizedBox(height: 14),
+
+                /// Members Row
+                Row(
+                  children: [
+
+                    const Icon(
+                      Icons.group_outlined,
+                      size: 16,
+                      color: Colors.black54,
+                    ),
+
+                    const SizedBox(width: 8),
+
+                    _memberAvatar("S"),
+                    const SizedBox(width: 6),
+                    _memberAvatar("M"),
+                  ],
+                ),
+              ],
             ),
           ),
         );
       },
     );
   }
-
+  Widget _memberAvatar(String letter) {
+    return CircleAvatar(
+      radius: 14,
+      backgroundColor: const Color(0xFFDCE9E2),
+      child: Text(
+        letter,
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: Color(0xFF2E6F55),
+        ),
+      ),
+    );
+  }
   Widget _buildStatusPage() {
     return Obx(() {
       final completedLists = controller.lists
@@ -280,14 +287,14 @@ class HomePage extends StatelessWidget {
           .toList();
 
       return ListView(
-        padding: const EdgeInsets.all(12),
+        padding: EdgeInsets.all(12),
         children: [
           Text(
             "Uncompleted (${incompleteLists.length})",
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 8),
-          if (incompleteLists.isEmpty) const Text("No Uncompleted lists"),
+          SizedBox(height: 8),
+          if (incompleteLists.isEmpty) Text("No Uncompleted lists"),
           ...incompleteLists.map((doc) {
             final data = doc.data() as Map<String, dynamic>;
             final name = data["name"] ?? "Unnamed List";
@@ -295,20 +302,20 @@ class HomePage extends StatelessWidget {
               color: Colors.red[100],
               child: ListTile(
                 title: Text(name),
-                trailing: const Icon(Icons.close, color: Colors.red),
+                trailing: Icon(Icons.close, color: Colors.red),
                 onTap: () {
                   Get.to(() => ListDetailsPage(listId: doc.id, listName: name));
                 },
               ),
             );
           }),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
           Text(
             "Completed (${completedLists.length})",
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 8),
-          if (completedLists.isEmpty) const Text("No completed lists"),
+          SizedBox(height: 8),
+          if (completedLists.isEmpty) Text("No completed lists"),
           ...completedLists.map((doc) {
             final data = doc.data() as Map<String, dynamic>;
             final name = data["name"] ?? "Unnamed List";
@@ -316,7 +323,7 @@ class HomePage extends StatelessWidget {
               color: Colors.white,
               child: ListTile(
                 title: Text(name),
-                trailing: const Icon(Icons.check_circle, color: Colors.green),
+                trailing: Icon(Icons.check_circle, color: Colors.green),
                 onTap: () {
                   Get.to(() => ListDetailsPage(listId: doc.id, listName: name));
                 },
@@ -327,160 +334,207 @@ class HomePage extends StatelessWidget {
       );
     });
   }
-
-  void _showCreateListDialog(BuildContext context) {
+  void _showCreateListBottomSheet(BuildContext context) {
     final TextEditingController controllerText = TextEditingController();
-    Get.dialog(
-      AlertDialog(
-        title: const Text("Create New List"),
-        backgroundColor: Colors.green[100],
-        content: TextField(
-          controller: controllerText,
-          decoration: const InputDecoration(hintText: "List name"),
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text("Cancel")),
-          TextButton(
-            onPressed: () async {
-              final name = controllerText.text.trim();
-              if (name.isNotEmpty) {
-                await controller.createList(name);
-                Get.back();
-              }
-            },
-            child: const Text("Create"),
-          ),
-        ],
-      ),
-    );
-  }
 
-  void _showEditNameDialog(BuildContext context) {
-    final TextEditingController controllerText = TextEditingController(
-      text: controller.userName.value,
-    );
-    Get.dialog(
-      AlertDialog(
-        title: const Text("Edit Name"),
-        backgroundColor: Colors.green[100],
-        content: TextField(
-          controller: controllerText,
-          decoration: const InputDecoration(hintText: "Enter new name"),
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text("Cancel")),
-          TextButton(
-            onPressed: () async {
-              final newName = controllerText.text.trim();
-              if (newName.isNotEmpty) {
-                await controller.updateUserName(newName);
-              }
-              Get.back();
-              Get.snackbar(
-                "Updated",
-                "Name updated successfully",
-                snackPosition: SnackPosition.BOTTOM,
-              );
-            },
-            child: const Text("Save"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showOwnerActions(BuildContext context, String listId, String name) {
     Get.bottomSheet(
-      backgroundColor: Colors.green[100],
-      Wrap(
-        children: [
-          ListTile(
-            leading: const Icon(Icons.edit),
-            title: const Text("Rename List"),
-            onTap: () {
-              Get.back();
-              final TextEditingController renameController =
-                  TextEditingController(text: name);
-              Get.dialog(
-                AlertDialog(
-                  title: const Text("Rename List"),
-                  content: TextField(
-                    controller: renameController,
-                    decoration: const InputDecoration(
-                      hintText: "Enter new list name",
-                    ),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Get.back(),
-                      child: const Text("Cancel"),
-                    ),
-                    TextButton(
-                      onPressed: () async {
-                        final newName = renameController.text.trim();
-                        if (newName.isNotEmpty) {
-                          Get.back();
-                          await controller.renameList(listId, newName);
-                        }
-                      },
-                      child: const Text("Save"),
-                    ),
-                  ],
+      Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// Drag Handle
+            Center(
+              child: Container(
+                height: 5,
+                width: 40,
+                margin: const EdgeInsets.only(bottom: 20),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(10),
                 ),
-              );
-            },
+              ),
+            ),
+
+            /// Title
+            const Center(
+              child: Text(
+                "Add Item",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+              ),
+            ),
+
+            const SizedBox(height: 6),
+
+            /// Subtitle
+            Center(
+              child: Text(
+                "Add a new item to your list",
+                style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            /// TextField
+            TextField(
+              controller: controllerText,
+              decoration: InputDecoration(
+                hintText: "Item name",
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Colors.green),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            /// TextField
+            TextField(
+              controller: controllerText,
+              decoration: InputDecoration(
+                hintText: "Quantity(e.g. 2L, 1 dozen",
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Colors.green),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            /// Add Button
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green[300],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                onPressed: () async {
+                  final name = controllerText.text.trim();
+                  if (name.isNotEmpty) {
+                    await controller.createList(name);
+                    Get.back();
+                  }
+                },
+                child: const Text("Add Item", style: TextStyle(fontSize: 16)),
+              ),
+            ),
+
+            const SizedBox(height: 2),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
+
+}
+
+
+class OrderToggleSwitch extends StatefulWidget {
+  @override
+  _OrderToggleSwitchState createState() => _OrderToggleSwitchState();
+}
+
+class _OrderToggleSwitchState extends State<OrderToggleSwitch> {
+  bool showActive = true; // State to track which tab is selected
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF7F6F2), // Light beige background
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // "Active" Tab
+          _buildTab(
+            label: "Active",
+            icon: Icons.shopping_cart_outlined,
+            isSelected: showActive,
+            onTap: () => setState(() => showActive = true),
           ),
-          ListTile(
-            leading: const Icon(Icons.delete),
-            title: const Text("Delete List"),
-            onTap: () async {
-              Get.back();
-              await controller.deleteList(listId, name);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.check_circle),
-            title: const Text("Mark as Completed"),
-            onTap: () async {
-              Get.back();
-              await controller.markCompleted(listId, name);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.person_add),
-            title: const Text("Invite Member"),
-            onTap: () {
-              Get.back();
-              _showInviteDialog(context, listId);
-            },
+          const SizedBox(width: 8),
+          // "History" Tab
+          _buildTab(
+            label: "History",
+            icon: Icons.history,
+            isSelected: !showActive,
+            onTap: () => setState(() => showActive = false),
           ),
         ],
       ),
     );
   }
 
-  void _showInviteDialog(BuildContext context, String listId) {
-    final TextEditingController emailController = TextEditingController();
-    Get.dialog(
-      AlertDialog(
-        title: const Text("Invite Member"),
-        content: TextField(
-          controller: emailController,
-          decoration: const InputDecoration(hintText: "Enter member's email"),
+  Widget _buildTab({
+    required String label,
+    required IconData icon,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: isSelected
+              ? [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            )
+          ]
+              : [],
         ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text("Cancel")),
-          TextButton(
-            onPressed: () async {
-              final email = emailController.text.trim();
-              if (email.isNotEmpty) {
-                await controller.inviteMember(listId, email);
-                Get.back();
-              }
-            },
-            child: const Text("Invite"),
-          ),
-        ],
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 20,
+              color: isSelected ? const Color(0xFF1B2E28) : const Color(0xFF7A8D86),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: isSelected ? const Color(0xFF1B2E28) : const Color(0xFF7A8D86),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

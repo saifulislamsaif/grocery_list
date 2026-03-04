@@ -74,13 +74,130 @@ class ListDetailsPage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _showAddItemDialog(context, itemsRef, itemController);
+          _showCreateListBottomSheet(context);
         },
         child: const Icon(Icons.add),
       ),
     );
   }
+  void _showCreateListBottomSheet(BuildContext context) {
+    final TextEditingController controllerText = TextEditingController();
 
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// Drag Handle
+            Center(
+              child: Container(
+                height: 5,
+                width: 40,
+                margin: const EdgeInsets.only(bottom: 20),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+
+            /// Title
+            const Center(
+              child: Text(
+                "Add Item",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+              ),
+            ),
+
+            const SizedBox(height: 6),
+
+            /// Subtitle
+            Center(
+              child: Text(
+                "Add a new item to your list",
+                style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            /// TextField
+            TextField(
+              controller: controllerText,
+              decoration: InputDecoration(
+                hintText: "Item name",
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Colors.green),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            /// TextField
+            TextField(
+              controller: controllerText,
+              decoration: InputDecoration(
+                hintText: "Quantity(e.g. 2L, 1 dozen",
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Colors.green),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            /// Add Button
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green[300],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                onPressed: () async {
+                  final name = controllerText.text.trim();
+                  // if (name.isNotEmpty) {
+                  //   await controller.createList(name);
+                  //   Get.back();
+                  // }
+                },
+                child: const Text("Add Item", style: TextStyle(fontSize: 16)),
+              ),
+            ),
+
+            const SizedBox(height: 2),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
   void _showAddItemDialog(BuildContext context,
       CollectionReference<Map<String, dynamic>> itemsRef,
       TextEditingController controller) {

@@ -32,7 +32,7 @@ class LoginPage extends StatelessWidget {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16),
           child: ConstrainedBox(
             constraints: BoxConstraints(
               minHeight: screenHeight -
@@ -43,7 +43,7 @@ class LoginPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Center(
+                   Center(
                     child: Text(
                       "Welcome Back",
                       textAlign: TextAlign.center,
@@ -54,16 +54,16 @@ class LoginPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 40),
+                   SizedBox(height: 40),
                   Text(
                     "Login",
-                    style: const TextStyle(
+                    style:  TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Color(0x980d50da),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                   SizedBox(height: 20),
 
                   _buildTextField(
                     controller: emailController,
@@ -71,7 +71,7 @@ class LoginPage extends StatelessWidget {
                     label: "Email",
                     hint: "Enter your email",
                   ),
-                  const SizedBox(height: 16),
+                   SizedBox(height: 16),
 
                   Obx(() => _buildTextField(
                     controller: passwordController,
@@ -92,28 +92,28 @@ class LoginPage extends StatelessWidget {
                     ),
                   )),
 
-                  const SizedBox(height: 20),
+                   SizedBox(height: 20),
                   Obx(() => authController.errorMessage.isNotEmpty
                       ? Text(
                     authController.errorMessage.value,
-                    style: const TextStyle(color: Colors.red),
+                    style:  TextStyle(color: Colors.red),
                   )
-                      : const SizedBox.shrink()),
-                  const SizedBox(height: 30),
+                      :  SizedBox.shrink()),
+                   SizedBox(height: 30),
 
                   Obx(
                         () => ElevatedButton(
                       onPressed:
                       authController.isLoading.value ? null : handleLogin,
                       style: ElevatedButton.styleFrom(
-                        minimumSize: const Size.fromHeight(56),
-                        backgroundColor: const Color(0x980d47bf),
+                        minimumSize:  Size.fromHeight(56),
+                        backgroundColor:  Color(0x980d47bf),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
                       ),
                       child: authController.isLoading.value
-                          ? const SizedBox(
+                          ?  SizedBox(
                         height: 22,
                         width: 22,
                         child: CircularProgressIndicator(
@@ -121,18 +121,18 @@ class LoginPage extends StatelessWidget {
                           color: Colors.white,
                         ),
                       )
-                          : const Text(
+                          :  Text(
                         "Login",
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 12),
+                   SizedBox(height: 12),
                   TextButton(
                     onPressed: () => Get.to(() => SignUpPage()),
                     child: RichText(
-                      text: const TextSpan(
+                      text:  TextSpan(
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 14,
@@ -172,12 +172,12 @@ class LoginPage extends StatelessWidget {
       children: [
         Row(
           children: [
-            const SizedBox(width: 8),
+             SizedBox(width: 8),
             Icon(prefixIcon, size: 12, color: Colors.grey),
-            const SizedBox(width: 8),
+             SizedBox(width: 8),
             Text(
               label,
-              style: const TextStyle(
+              style:  TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: Colors.grey,
@@ -185,35 +185,35 @@ class LoginPage extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 8),
+         SizedBox(height: 8),
         TextField(
           controller: controller,
           obscureText: obscureText,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(color: Colors.grey),
+            hintStyle:  TextStyle(color: Colors.grey),
             filled: true,
             fillColor: Colors.white,
             suffixIcon: suffixIcon,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(
+              borderSide:  BorderSide(
                 color: Colors.grey,
                 width: 1.2,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(
+              borderSide:  BorderSide(
                 color: Colors.grey,
                 width: 1.5,
               ),
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Colors.grey),
+              borderSide:  BorderSide(color: Colors.grey),
             ),
-            contentPadding: const EdgeInsets.symmetric(
+            contentPadding:  EdgeInsets.symmetric(
               horizontal: 20,
               vertical: 16,
             ),

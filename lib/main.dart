@@ -10,25 +10,25 @@ import 'firebase_options.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const MyApp());
+  runApp( MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+   MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Shared Grocery List',
-      home: const Root(),
+      home:  Root(),
     );
   }
 }
 
 
 class Root extends StatelessWidget {
-  const Root({super.key});
+   Root({super.key});
 
   @override
   Widget build(BuildContext context) {

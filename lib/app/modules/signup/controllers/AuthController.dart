@@ -1,20 +1,27 @@
-import 'package:get/get.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
+
 import '../../home/controllers/home_controller.dart';
-import '../views/LoginPage.dart';
 import '../../home/views/home_page.dart';
+import '../views/LoginPage.dart';
+
 
 class AuthController extends GetxController {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  AuthController({
+    FirebaseAuth? auth,
+    FirebaseFirestore? firestore,
+  })  : _auth = auth ?? FirebaseAuth.instance,
+        _db = firestore ?? FirebaseFirestore.instance;
 
-  Rx<User?> firebaseUser = Rx<User?>(null);
+  final FirebaseAuth _auth;
+  final FirebaseFirestore _db;
+
+  final Rxn<User> firebaseUser = Rxn<User>();
+  final isLoading = false.obs;
+  final errorMessage = ''.obs;
 
   User? get user => firebaseUser.value;
-  var isLoading = false.obs;
-  var errorMessage = ''.obs;
-
 
   @override
   void onInit() {
@@ -22,7 +29,7 @@ class AuthController extends GetxController {
     firebaseUser.bindStream(_auth.authStateChanges());
   }
 
-  // Sign Up
+
   Future<void> signUp(String name, String email, String password) async {
     try {
       UserCredential cred = await _auth.createUserWithEmailAndPassword(

@@ -27,12 +27,12 @@ class HomeController extends GetxController {
   }
 
   void listenUserName() {
-    _userSub.cancel(); // cancel old subscription if any
-    _listenUserName(); // call private method
+    _userSub.cancel();
+    _listenUserName();
   }
 
   void listenGroceryLists() {
-    _listsSub.cancel(); // cancel old subscription if any
+    _listsSub.cancel();
     _listenGroceryLists();
   }
 
@@ -47,6 +47,13 @@ class HomeController extends GetxController {
     resetData();
     listenUserName();
     listenGroceryLists();
+  }
+
+  void clearState() {
+    userName.value = '';
+    lists.clear();
+    completedCount.value = 0;
+    incompleteCount.value = 0;
   }
 
   void _listenUserName() {
