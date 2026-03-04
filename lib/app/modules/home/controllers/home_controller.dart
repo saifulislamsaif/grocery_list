@@ -12,9 +12,8 @@ class HomeController extends GetxController {
   var incompleteCount = 0.obs;
   late StreamSubscription<DocumentSnapshot> _userSub;
   late StreamSubscription<QuerySnapshot> _listsSub;
-
+  var showActive = true.obs;
   final RxInt selectedIndex = 0.obs;
-
   String? get uid => authController.user?.uid;
 
   @override

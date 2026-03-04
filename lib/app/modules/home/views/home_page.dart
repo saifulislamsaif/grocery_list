@@ -19,9 +19,11 @@ class HomePage extends StatelessWidget {
       return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: const Color(0xFFF7F6F2), // Matches the off-white background
+          backgroundColor: const Color(0xFFF7F6F2),
+          // Matches the off-white background
           elevation: 0,
-          leadingWidth: 200, // Increased to fit the logo and text comfortably
+          leadingWidth: 200,
+          // Increased to fit the logo and text comfortably
           leading: Padding(
             padding: const EdgeInsets.only(left: 16.0),
             child: Row(
@@ -47,7 +49,8 @@ class HomePage extends StatelessWidget {
                   style: TextStyle(
                     color: Color(0xFF1B2E28),
                     fontSize: 22,
-                    fontWeight: FontWeight.w900, // Extra bold to match the image
+                    fontWeight: FontWeight.w900,
+                    // Extra bold to match the image
                     letterSpacing: -0.5,
                   ),
                 ),
@@ -93,11 +96,176 @@ class HomePage extends StatelessWidget {
     });
   }
 
+  Widget _historyView(BuildContext context) {
+    final completedLists = controller.lists
+        .where(
+          (doc) => (doc.data() as Map<String, dynamic>)['completed'] == true,
+        )
+        .toList();
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        /// RECENT ACTIVITY TITLE
+        const Text(
+          "RECENT ACTIVITY",
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1,
+            color: Colors.black54,
+          ),
+        ),
+
+        const SizedBox(height: 12),
+
+        /// Fake activity design (like screenshot)
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF1F4F2),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            children: [
+              _activityTile(
+                icon: Icons.check,
+                text: "You completed Cherry Tomatoes",
+                time: "2 days ago",
+              ),
+              _activityTile(
+                icon: Icons.add,
+                text: "Emma added Sparkling Water",
+                time: "4 days ago",
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 30),
+
+        /// PAST LISTS TITLE
+        const Text(
+          "PAST LISTS",
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1,
+            color: Colors.black54,
+          ),
+        ),
+
+        const SizedBox(height: 12),
+
+        ...completedLists.map((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          final name = data["name"] ?? "Unnamed List";
+          final itemsCount = data["itemsCount"] ?? 0;
+          final purchasedCount = data["purchasedCount"] ?? 0;
+
+          final percent = itemsCount == 0 ? 0.0 : purchasedCount / itemsCount;
+
+          return Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF1F4F2),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// Title + Archived Badge
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFDCE9E2),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Text(
+                        "Archived",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF2E6F55),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 10),
+
+                Text(
+                  "$purchasedCount of $itemsCount items",
+                  style: const TextStyle(fontSize: 13),
+                ),
+
+                const SizedBox(height: 8),
+
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: LinearProgressIndicator(
+                    value: percent,
+                    minHeight: 6,
+                    backgroundColor: Colors.grey.shade300,
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      Color(0xFF2E6F55),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: const [
+                    Text("2 people", style: TextStyle(fontSize: 13)),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.check,
+                          size: 16,
+                          color: Colors.green,
+                        ),
+                        SizedBox(width:10),
+                        Text(
+                          "Done",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFF2E6F55),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      ],
+    );
+  }
+
   Widget _buildHomeContent(BuildContext context) {
     return Obx(() {
       if (controller.lists.isEmpty) {
         return Center(child: Text("No grocery lists yet"));
       }
+
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -106,11 +274,16 @@ class HomePage extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: OrderToggleSwitch(),
           ),
-          Expanded(child: _listsView(context)),
+          Expanded(
+            child: controller.showActive.value
+                ? _listsView(context) // ACTIVE
+                : _historyView(context), // HISTORY
+          ),
         ],
       );
     });
   }
+
   Widget _listsView(BuildContext context) {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
@@ -123,15 +296,11 @@ class HomePage extends StatelessWidget {
         final itemsCount = data["itemsCount"] ?? 0;
         final purchasedCount = data["purchasedCount"] ?? 0;
 
-        final percent =
-        itemsCount == 0 ? 0.0 : purchasedCount / itemsCount;
+        final percent = itemsCount == 0 ? 0.0 : purchasedCount / itemsCount;
 
         return GestureDetector(
           onTap: () {
-            Get.to(() => ListDetailsPage(
-              listId: doc.id,
-              listName: name,
-            ));
+            Get.to(() => ListDetailsPage(listId: doc.id, listName: name));
           },
           child: Container(
             margin: const EdgeInsets.only(bottom: 16),
@@ -143,12 +312,10 @@ class HomePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 /// Top Row
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
                     /// Icon Box
                     Container(
                       height: 48,
@@ -170,7 +337,6 @@ class HomePage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-
                           Text(
                             name,
                             style: const TextStyle(
@@ -237,7 +403,6 @@ class HomePage extends StatelessWidget {
                 /// Members Row
                 Row(
                   children: [
-
                     const Icon(
                       Icons.group_outlined,
                       size: 16,
@@ -258,6 +423,7 @@ class HomePage extends StatelessWidget {
       },
     );
   }
+
   Widget _memberAvatar(String letter) {
     return CircleAvatar(
       radius: 14,
@@ -272,6 +438,7 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildStatusPage() {
     return Obx(() {
       final completedLists = controller.lists
@@ -334,165 +501,80 @@ class HomePage extends StatelessWidget {
       );
     });
   }
-  void _showCreateListBottomSheet(BuildContext context) {
-    final TextEditingController controllerText = TextEditingController();
 
-    Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// Drag Handle
-            Center(
-              child: Container(
-                height: 5,
-                width: 40,
-                margin: const EdgeInsets.only(bottom: 20),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-
-            /// Title
-            const Center(
-              child: Text(
-                "Add Item",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-              ),
-            ),
-
-            const SizedBox(height: 6),
-
-            /// Subtitle
-            Center(
-              child: Text(
-                "Add a new item to your list",
-                style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            /// TextField
-            TextField(
-              controller: controllerText,
-              decoration: InputDecoration(
-                hintText: "Item name",
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Colors.green),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            /// TextField
-            TextField(
-              controller: controllerText,
-              decoration: InputDecoration(
-                hintText: "Quantity(e.g. 2L, 1 dozen",
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Colors.green),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            /// Add Button
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green[300],
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+  Widget _activityTile({
+    required IconData icon,
+    required String text,
+    required String time,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 16,
+            backgroundColor: const Color(0xFFDCE9E2),
+            child: Icon(icon, size: 16, color: Color(0xFF2E6F55)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  text,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                onPressed: () async {
-                  final name = controllerText.text.trim();
-                  if (name.isNotEmpty) {
-                    await controller.createList(name);
-                    Get.back();
-                  }
-                },
-                child: const Text("Add Item", style: TextStyle(fontSize: 16)),
-              ),
+                Text(
+                  time,
+                  style: const TextStyle(fontSize: 12, color: Colors.black54),
+                ),
+              ],
             ),
-
-            const SizedBox(height: 2),
-          ],
-        ),
-      ),
-      isScrollControlled: true,
-    );
-  }
-
-}
-
-
-class OrderToggleSwitch extends StatefulWidget {
-  @override
-  _OrderToggleSwitchState createState() => _OrderToggleSwitchState();
-}
-
-class _OrderToggleSwitchState extends State<OrderToggleSwitch> {
-  bool showActive = true; // State to track which tab is selected
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF7F6F2), // Light beige background
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // "Active" Tab
-          _buildTab(
-            label: "Active",
-            icon: Icons.shopping_cart_outlined,
-            isSelected: showActive,
-            onTap: () => setState(() => showActive = true),
-          ),
-          const SizedBox(width: 8),
-          // "History" Tab
-          _buildTab(
-            label: "History",
-            icon: Icons.history,
-            isSelected: !showActive,
-            onTap: () => setState(() => showActive = false),
           ),
         ],
       ),
     );
+  }
+}
+
+class OrderToggleSwitch extends StatelessWidget {
+  final HomeController controller = Get.find();
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      final showActive = controller.showActive.value;
+
+      return Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF7F6F2),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildTab(
+              label: "Active",
+              icon: Icons.shopping_cart_outlined,
+              isSelected: showActive,
+              onTap: () => controller.showActive.value = true,
+            ),
+            const SizedBox(width: 8),
+            _buildTab(
+              label: "History",
+              icon: Icons.history,
+              isSelected: !showActive,
+              onTap: () => controller.showActive.value = false,
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildTab({
@@ -510,12 +592,12 @@ class _OrderToggleSwitchState extends State<OrderToggleSwitch> {
           borderRadius: BorderRadius.circular(15),
           boxShadow: isSelected
               ? [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            )
-          ]
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
               : [],
         ),
         child: Row(
@@ -523,14 +605,18 @@ class _OrderToggleSwitchState extends State<OrderToggleSwitch> {
             Icon(
               icon,
               size: 20,
-              color: isSelected ? const Color(0xFF1B2E28) : const Color(0xFF7A8D86),
+              color: isSelected
+                  ? const Color(0xFF1B2E28)
+                  : const Color(0xFF7A8D86),
             ),
             const SizedBox(width: 8),
             Text(
               label,
               style: TextStyle(
                 fontWeight: FontWeight.w600,
-                color: isSelected ? const Color(0xFF1B2E28) : const Color(0xFF7A8D86),
+                color: isSelected
+                    ? const Color(0xFF1B2E28)
+                    : const Color(0xFF7A8D86),
               ),
             ),
           ],
