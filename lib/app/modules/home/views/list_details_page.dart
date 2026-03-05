@@ -5,6 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../controllers/home_controller.dart';
+
 class ListDetailsPage extends StatelessWidget {
   final String listId;
   final String listName;
@@ -46,9 +48,10 @@ class ListDetailsPage extends StatelessWidget {
           ],
         ),
         actions: [
-          // Simulated Avatar Group
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
+          GestureDetector(
+            onTap: () {
+              _showSharedMembersSheet(context, listId);
+            },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
@@ -60,13 +63,17 @@ class ListDetailsPage extends StatelessWidget {
                 children: [
                   const Icon(Icons.group_outlined, size: 18, color: Colors.grey),
                   const SizedBox(width: 4),
-                  CircleAvatar(radius: 10, backgroundColor: Colors.green[100], child: const Text("S", style: TextStyle(fontSize: 10))),
+                  CircleAvatar(
+                    radius: 10,
+                    backgroundColor: Colors.green[100],
+                    child: const Text("S", style: TextStyle(fontSize: 10)),
+                  ),
                   const SizedBox(width: 4),
                   const Text("2", style: TextStyle(fontSize: 12, color: Colors.grey)),
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
       body: StreamBuilder<QuerySnapshot>(
@@ -98,6 +105,199 @@ class ListDetailsPage extends StatelessWidget {
         backgroundColor: const Color(0xFF006D4E), // Dark Teal from image
         onPressed: () => _showCreateItemBottomSheet(context),
         child: const Icon(Icons.add, color: Colors.white),
+      ),
+    );
+  }
+  void _showSharedMembersSheet(BuildContext context, String listId) {
+
+    final controller = Get.find<HomeController>();
+
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            /// drag indicator
+            Center(
+              child: Container(
+                height: 4,
+                width: 40,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+
+            /// Title
+            const Center(
+              child: Text(
+                "Shared Members",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 6),
+
+            Center(
+              child: Text(
+                "People who have access to this list",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            /// Label
+            const Text(
+              "SHARED WITH",
+              style: TextStyle(
+                fontSize: 12,
+                letterSpacing: 1.2,
+                color: Colors.grey,
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            /// Members list
+            Obx(() {
+              final list = controller.lists
+                  .firstWhere((e) => e.id == listId);
+
+              final data = list.data() as Map<String, dynamic>;
+              final members = List<String>.from(data["members"] ?? []);
+
+              return Wrap(
+                spacing: 10,
+                children: members.map((uid) {
+
+                  final letter = uid.substring(0, 1).toUpperCase();
+
+                  return _memberChip(letter, uid == controller.uid ? "You" : "Member",
+                      isOwner: uid == data["ownerId"]);
+
+                }).toList(),
+              );
+            }),
+
+            const SizedBox(height: 20),
+
+            /// Invite button
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                icon: const Icon(Icons.person_add_alt_1),
+                label: const Text("Invite"),
+                onPressed: () {
+                  Get.back();
+                  _showInviteDialog(listId);
+                },
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            /// Close button
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: () => Get.back(),
+                child: const Text("Close"),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  void _showInviteDialog(String listId) {
+
+    final TextEditingController emailController = TextEditingController();
+    final controller = Get.find<HomeController>();
+
+    Get.dialog(
+      AlertDialog(
+        title: const Text("Invite Member"),
+        content: TextField(
+          controller: emailController,
+          decoration: const InputDecoration(
+            hintText: "Enter user email",
+          ),
+        ),
+        actions: [
+
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text("Cancel"),
+          ),
+
+          TextButton(
+            onPressed: () async {
+              final email = emailController.text.trim();
+
+              await controller.inviteMember(listId, email);
+            },
+            child: const Text("Invite"),
+          ),
+        ],
+      ),
+    );
+  }
+  Widget _memberChip(String letter, String name, {bool isOwner = false}) {
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF2F4F3),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+
+          CircleAvatar(
+            radius: 12,
+            backgroundColor: Colors.green[100],
+            child: Text(
+              letter,
+              style: const TextStyle(fontSize: 11),
+            ),
+          ),
+
+          const SizedBox(width: 6),
+
+          Text(
+            name,
+            style: const TextStyle(fontSize: 13),
+          ),
+
+          if (isOwner)
+            const Padding(
+              padding: EdgeInsets.only(left: 4),
+              child: Text(
+                "(owner)",
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -240,7 +440,6 @@ class ListDetailsPage extends StatelessWidget {
     required String quantity,
   }) async {
     try {
-      // 1. Add the item
       await FirebaseFirestore.instance
           .collection("grocery_lists")
           .doc(listId)
@@ -253,7 +452,6 @@ class ListDetailsPage extends StatelessWidget {
         "createdAt": FieldValue.serverTimestamp(),
       });
 
-      // 2. Update the counters
       await _updateCounters(listId);
     } catch (e) {
       debugPrint("Error adding item: $e");
