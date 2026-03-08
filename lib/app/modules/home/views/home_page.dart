@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../invitation/views/invitation_view.dart';
 import '../../signup/controllers/AuthController.dart';
 import '../../signup/views/LoginPage.dart';
 import '../controllers/home_controller.dart';
@@ -90,7 +91,9 @@ class HomePage extends StatelessWidget {
 
             /// MAIL ICON
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                Get.to(() => InvitePage());
+              },
               icon: const Icon(
                 Icons.mail_outline,
                 color: Color(0xFF1B2E28),

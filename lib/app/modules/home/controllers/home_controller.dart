@@ -16,6 +16,8 @@ class HomeController extends GetxController {
   var showActive = true.obs;
   final RxInt selectedIndex = 0.obs;
   String? get uid => authController.user?.uid;
+  var invites = <DocumentSnapshot>[].obs;
+  late StreamSubscription<QuerySnapshot> _inviteSub;
 
   @override
   void onInit() {
@@ -23,9 +25,44 @@ class HomeController extends GetxController {
     if (uid != null) {
       _listenUserName();
       _listenGroceryLists();
+      _listenInvites(); // ADD THIS
     }
   }
+  void _listenInvites() {
+    if (uid == null) return;
 
+    _inviteSub = FirebaseFirestore.instance
+        .collection("list_invites")
+        .where("inviteeUid", isEqualTo: uid)
+        .where("status", isEqualTo: "pending")
+        .snapshots()
+        .listen((snapshot) {
+      invites.value = snapshot.docs;
+    });
+  }
+
+  Future<void> acceptInvite(String inviteId, String listId) async {
+
+    await FirebaseFirestore.instance
+        .collection("grocery_lists")
+        .doc(listId)
+        .update({
+      "members": FieldValue.arrayUnion([uid])
+    });
+
+    await FirebaseFirestore.instance
+        .collection("list_invites")
+        .doc(inviteId)
+        .update({
+      "status": "accepted"
+    });
+
+    Get.snackbar(
+      "Success",
+      "List added to your account",
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
   void listenUserName() {
     _userSub.cancel();
     _listenUserName();
@@ -169,7 +206,6 @@ class HomeController extends GetxController {
   }
 
   Future<void> inviteMember(String listId, String email) async {
-    if (email.isEmpty) return;
 
     final userQuery = await FirebaseFirestore.instance
         .collection("users")
@@ -177,26 +213,35 @@ class HomeController extends GetxController {
         .get();
 
     if (userQuery.docs.isEmpty) {
-      Get.snackbar(
-        "Error",
-        "User not found",
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      Get.snackbar("Error","User not found");
       return;
     }
 
-    final uidToAdd = userQuery.docs.first.id;
+    final userDoc = userQuery.docs.first;
+    final uidToAdd = userDoc.id;
 
-    await FirebaseFirestore.instance
+    final listDoc = await FirebaseFirestore.instance
         .collection("grocery_lists")
         .doc(listId)
-        .update({
-          "members": FieldValue.arrayUnion([uidToAdd]),
-        });
+        .get();
+
+    final listName = listDoc.data()?["name"] ?? "List";
+
+    await FirebaseFirestore.instance.collection("list_invites").add({
+      "listId": listId,
+      "listName": listName,
+      "ownerId": uid,
+      "inviteeUid": uidToAdd,
+      "inviteeEmail": email,
+      "status": "pending",
+      "createdAt": FieldValue.serverTimestamp()
+    });
+
     Get.back();
+
     Get.snackbar(
-      "Success",
-      "$email added to the list",
+      "Invite Sent",
+      "$email invited successfully",
       snackPosition: SnackPosition.BOTTOM,
     );
   }
