@@ -74,7 +74,9 @@ class AuthController extends GetxController {
       );
     }
   }
-
+  Future<void> logout() async {
+    await FirebaseAuth.instance.signOut();
+  }
   // Login
   void onLogin(User user) {
     final homeController = Get.find<HomeController>();
@@ -94,14 +96,4 @@ class AuthController extends GetxController {
   }
 
 
-  void logout() async {
-    await FirebaseAuth.instance.signOut();
-    final homeController = Get.find<HomeController>();
-    homeController.userName.value = '';
-    homeController.lists.clear();
-    homeController.completedCount.value = 0;
-    homeController.incompleteCount.value = 0;
-    homeController.cancelUserListener();
-    Get.offAll(() => LoginPage());
-  }
 }

@@ -20,100 +20,112 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        surfaceTintColor: Colors.white,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
+      backgroundColor: const Color(0xffF4F4F4),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(16),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: screenHeight -
-                  kToolbarHeight -
-                  MediaQuery.of(context).padding.top,
-            ),
-            child: IntrinsicHeight(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                   Center(
-                    child: Text(
-                      "Welcome Back",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xf0131212),
-                      ),
-                    ),
-                  ),
-                   SizedBox(height: 40),
-                  Text(
-                    "Login",
-                    style:  TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0x980d50da),
-                    ),
-                  ),
-                   SizedBox(height: 20),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
 
-                  _buildTextField(
-                    controller: emailController,
-                    prefixIcon: Icons.email,
-                    label: "Email",
-                    hint: "Enter your email",
+                /// LOGO
+                Container(
+                  height: 70,
+                  width: 70,
+                  decoration: BoxDecoration(
+                    color: const Color(0xff2F7D57),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                   SizedBox(height: 16),
+                  child: const Icon(
+                    Icons.eco,
+                    color: Colors.white,
+                    size: 34,
+                  ),
+                ),
 
-                  Obx(() => _buildTextField(
+                const SizedBox(height: 20),
+
+                /// APP NAME
+                const Text(
+                  "Grocerly",
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 6),
+
+                const Text(
+                  "Welcome back",
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
+                ),
+
+                const SizedBox(height: 40),
+
+                /// EMAIL FIELD
+                _buildInputField(
+                  controller: emailController,
+                  hint: "Email",
+                ),
+
+                const SizedBox(height: 16),
+
+                /// PASSWORD FIELD
+                Obx(
+                      () => _buildInputField(
                     controller: passwordController,
-                    prefixIcon: Icons.lock,
-                    label: "Password",
-                    hint: "Enter your password",
+                    hint: "Password",
                     obscureText: !showPassword.value,
                     suffixIcon: IconButton(
                       icon: Icon(
                         showPassword.value
                             ? Icons.visibility
                             : Icons.visibility_off,
-                        size: 16,
+                        size: 20,
                         color: Colors.grey,
                       ),
-                      onPressed: () =>
-                      showPassword.value = !showPassword.value,
+                      onPressed: () {
+                        showPassword.value = !showPassword.value;
+                      },
                     ),
-                  )),
+                  ),
+                ),
 
-                   SizedBox(height: 20),
-                  Obx(() => authController.errorMessage.isNotEmpty
-                      ? Text(
-                    authController.errorMessage.value,
-                    style:  TextStyle(color: Colors.red),
-                  )
-                      :  SizedBox.shrink()),
-                   SizedBox(height: 30),
+                const SizedBox(height: 20),
 
-                  Obx(
-                        () => ElevatedButton(
+                /// ERROR MESSAGE
+                Obx(() => authController.errorMessage.isNotEmpty
+                    ? Text(
+                  authController.errorMessage.value,
+                  style: const TextStyle(color: Colors.red),
+                )
+                    : const SizedBox()),
+
+                const SizedBox(height: 20),
+
+                /// SIGN IN BUTTON
+                Obx(
+                      () => SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: ElevatedButton(
                       onPressed:
                       authController.isLoading.value ? null : handleLogin,
                       style: ElevatedButton.styleFrom(
-                        minimumSize:  Size.fromHeight(56),
-                        backgroundColor:  Color(0x980d47bf),
+                        backgroundColor: const Color(0xff2F7D57),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(14),
                         ),
                       ),
                       child: authController.isLoading.value
-                          ?  SizedBox(
+                          ? const SizedBox(
                         height: 22,
                         width: 22,
                         child: CircularProgressIndicator(
@@ -121,37 +133,42 @@ class LoginPage extends StatelessWidget {
                           color: Colors.white,
                         ),
                       )
-                          :  Text(
-                        "Login",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
-
-                   SizedBox(height: 12),
-                  TextButton(
-                    onPressed: () => Get.to(() => SignUpPage()),
-                    child: RichText(
-                      text:  TextSpan(
+                          : const Text(
+                        "Sign In",
                         style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 14,
+                          color: Colors.white,
+                          fontSize: 16,
                         ),
-                        children: [
-                          TextSpan(text: "Don't have an account? "),
-                          TextSpan(
-                            text: "Sign Up",
-                            style: TextStyle(
-                              color: Colors.blueAccent,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+
+                const SizedBox(height: 20),
+
+                /// SIGN UP TEXT
+                TextButton(
+                  onPressed: () => Get.to(() => SignUpPage()),
+                  child: RichText(
+                    text: const TextSpan(
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 14,
+                      ),
+                      children: [
+                        TextSpan(text: "Don't have an account? "),
+                        TextSpan(
+                          text: "Sign Up",
+                          style: TextStyle(
+                            color: Color(0xff2F7D57),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -159,67 +176,30 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField({
+  Widget _buildInputField({
     required TextEditingController controller,
-    required IconData prefixIcon,
-    required String label,
-    String? hint,
+    required String hint,
     bool obscureText = false,
     Widget? suffixIcon,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-             SizedBox(width: 8),
-            Icon(prefixIcon, size: 12, color: Colors.grey),
-             SizedBox(width: 8),
-            Text(
-              label,
-              style:  TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey,
-              ),
-            ),
-          ],
+    return TextField(
+      controller: controller,
+      obscureText: obscureText,
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: const TextStyle(color: Colors.grey),
+        filled: true,
+        fillColor: Colors.white,
+        suffixIcon: suffixIcon,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide.none,
         ),
-         SizedBox(height: 8),
-        TextField(
-          controller: controller,
-          obscureText: obscureText,
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle:  TextStyle(color: Colors.grey),
-            filled: true,
-            fillColor: Colors.white,
-            suffixIcon: suffixIcon,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide:  BorderSide(
-                color: Colors.grey,
-                width: 1.2,
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide:  BorderSide(
-                color: Colors.grey,
-                width: 1.5,
-              ),
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide:  BorderSide(color: Colors.grey),
-            ),
-            contentPadding:  EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 16,
-            ),
-          ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
         ),
-      ],
+      ),
     );
   }
 }

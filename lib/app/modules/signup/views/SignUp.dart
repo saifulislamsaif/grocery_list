@@ -23,104 +23,129 @@ class SignUpPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        surfaceTintColor: Colors.white,
-        backgroundColor: Colors.transparent
-      ),
+      backgroundColor: const Color(0xffF4F4F4),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: screenHeight -
-                  kToolbarHeight -
-                  MediaQuery.of(context).padding.top,
-            ),
-            child: IntrinsicHeight(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
 
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Center(
-                    child: Text(
-                      "Create Account",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xf0131212), // change color to match your design
-                      ),
-                    ),
+                /// LOGO
+                Container(
+                  height: 70,
+                  width: 70,
+                  decoration: BoxDecoration(
+                    color: const Color(0xff2F7D57),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  const SizedBox(height: 40),
-                  Text("Sign up",style:  TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Color(
-                      0x980d50da))),
-                  const SizedBox(height: 20),
+                  child: const Icon(
+                    Icons.eco,
+                    color: Colors.white,
+                    size: 34,
+                  ),
+                ),
 
-                  _buildTextField(
-                    controller: nameController,
-                    prefixIcon: Icons.person,
-                    label: "Full Name",
-                    hint: "Enter your full name",
+                const SizedBox(height: 20),
+
+                /// TITLE
+                const Text(
+                  "Grocerly",
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
                   ),
-                  const SizedBox(height: 16),
-                  _buildTextField(
-                    controller: emailController,
-                    prefixIcon: Icons.email,
-                    label: "Email",
-                    hint: "Enter your email",
+                ),
+
+                const SizedBox(height: 6),
+
+                /// SUBTITLE
+                const Text(
+                  "Create your account",
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
                   ),
-                  const SizedBox(height: 16),
-                  _buildTextField(
-                    controller: passwordController,
-                    prefixIcon: Icons.lock,
-                    label: "Password",
-                    hint: "Enter your password",
-                    obscureText: true,
-                  ),
-                  const SizedBox(height: 40),
-                  ElevatedButton(
+                ),
+
+                const SizedBox(height: 40),
+
+                /// NAME FIELD
+                _buildInputField(
+                  controller: nameController,
+                  hint: "Display name",
+                ),
+
+                const SizedBox(height: 16),
+
+                /// EMAIL FIELD
+                _buildInputField(
+                  controller: emailController,
+                  hint: "Email",
+                ),
+
+                const SizedBox(height: 16),
+
+                /// PASSWORD FIELD
+                _buildInputField(
+                  controller: passwordController,
+                  hint: "Password",
+                  obscureText: true,
+                ),
+
+                const SizedBox(height: 24),
+
+                /// SIGN UP BUTTON
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton(
                     onPressed: handleSignUp,
-
                     style: ElevatedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(56),
-                      backgroundColor: const Color(0x980d47bf),
+                      backgroundColor: const Color(0xff2F7D57),
+                      elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    child: const Text("Sign Up",style: TextStyle(color: Colors.white),),
-                  ),
-                  const SizedBox(height: 12),
-                  TextButton(
-                    onPressed: () => Get.back(),
-                    child: RichText(
-                      text: TextSpan(
-                        style: TextStyle(
-                          color: Colors.black,       // default color for the whole sentence
-                          fontSize: 14,
-                        ),
-                        children: [
-                          TextSpan(text: "Already have an account? "),
-                          TextSpan(
-                            text: "Login",
-                            style: TextStyle(
-                              color: Colors.blueAccent,    // grey only for the word "Login"
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
+                    child: const Text(
+                      "Sign Up",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
                       ),
                     ),
                   ),
+                ),
 
-                ],
-              ),
+                const SizedBox(height: 20),
+
+                /// LOGIN TEXT
+                TextButton(
+                  onPressed: () => Get.back(),
+                  child: RichText(
+                    text: const TextSpan(
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 14,
+                      ),
+                      children: [
+                        TextSpan(text: "Already have an account? "),
+                        TextSpan(
+                          text: "Sign In",
+                          style: TextStyle(
+                            color: Color(0xff2F7D57),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -128,68 +153,28 @@ class SignUpPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField({
+  Widget _buildInputField({
     required TextEditingController controller,
-    required IconData prefixIcon,
-    required String label,
-    String? hint,
+    required String hint,
     bool obscureText = false,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            const SizedBox(width: 8),
-            Icon(prefixIcon, size: 12, color: Colors.grey,),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey,
-              ),
-            ),
-          ],
+    return TextField(
+      controller: controller,
+      obscureText: obscureText,
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: const TextStyle(color: Colors.grey),
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide.none,
         ),
-        const SizedBox(height: 8),
-        TextField(
-          controller: controller,
-          obscureText: obscureText,
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: const TextStyle(color: Colors.grey),
-            filled: true,
-            fillColor: Colors.white,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(
-                color: Colors.grey,      // Grey stroke when not focused
-                width: 1.2,              // Adjust thickness if you like
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(
-                color: Colors.grey,      // Grey stroke when focused
-                width: 1.5,
-              ),
-            ),
-            // Optional: border property as a fallback
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(
-                color: Colors.grey,
-              ),
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 16,
-            ),
-          ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
         ),
-      ],
+      ),
     );
   }
 

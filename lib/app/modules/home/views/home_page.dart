@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../signup/controllers/AuthController.dart';
+import '../../signup/views/LoginPage.dart';
 import '../controllers/home_controller.dart';
 import 'list_details_page.dart';
 
@@ -58,13 +59,15 @@ class HomePage extends StatelessWidget {
             ),
           ),
           actions: [
+
+            /// NEW LIST BUTTON
             Padding(
-              padding: const EdgeInsets.only(right: 16.0, top: 8, bottom: 8),
+              padding: const EdgeInsets.symmetric(vertical: 2),
               child: ElevatedButton.icon(
                 onPressed: () {
                   _showCreateListBottomSheet(context);
                 },
-                icon: const Icon(Icons.add, size: 18, color: Colors.white),
+                icon: const Icon(Icons.add, size: 14, color: Colors.white),
                 label: const Text(
                   "New List",
                   style: TextStyle(
@@ -73,15 +76,40 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF007953), // Deep green
+                  backgroundColor: const Color(0xFF2F7D57),
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
                 ),
               ),
             ),
+
+            const SizedBox(width: 4),
+
+            /// MAIL ICON
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(
+                Icons.mail_outline,
+                color: Color(0xFF1B2E28),
+              ),
+            ),
+
+            /// LOGOUT ICON
+            IconButton(
+              onPressed: () async {
+                await authController.logout();
+                Get.offAll(() => LoginPage());
+              },
+              icon: const Icon(
+                Icons.logout,
+                color: Color(0xFF1B2E28),
+              ),
+            ),
+
+            const SizedBox(width: 6),
           ],
         ),
         body: IndexedStack(
