@@ -119,109 +119,113 @@ class ListDetailsPage extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
 
-            /// drag indicator
-            Center(
-              child: Container(
-                height: 4,
-                width: 40,
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(10),
+                /// drag indicator
+                Center(
+                  child: Container(
+                    height: 4,
+                    width: 40,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
                 ),
-              ),
-            ),
 
-            /// Title
-            const Center(
-              child: Text(
-                "Shared Members",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
+                /// Title
+                const Center(
+                  child: Text(
+                    "Shared Members",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
-              ),
-            ),
 
-            const SizedBox(height: 6),
+                const SizedBox(height: 6),
 
-            Center(
-              child: Text(
-                "People who have access to this list",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
+                const Center(
+                  child: Text(
+                    "People who have access to this list",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                  ),
                 ),
-              ),
+
+                const SizedBox(height: 20),
+
+                /// Label
+                const Text(
+                  "SHARED WITH",
+                  style: TextStyle(
+                    fontSize: 12,
+                    letterSpacing: 1.2,
+                    color: Colors.grey,
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                /// Members list
+                Obx(() {
+                  final list = controller.lists.firstWhere((e) => e.id == listId);
+
+                  final data = list.data() as Map<String, dynamic>;
+                  final members = List<String>.from(data["members"] ?? []);
+
+                  return Wrap(
+                    spacing: 10,
+                    children: members.map((uid) {
+
+                      final letter = uid.substring(0, 1).toUpperCase();
+
+                      return _memberChip(
+                        letter,
+                        uid == controller.uid ? "You" : "Member",
+                        isOwner: uid == data["ownerId"],
+                      );
+
+                    }).toList(),
+                  );
+                }),
+
+                const SizedBox(height: 20),
+
+                /// Invite button
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.person_add_alt_1),
+                    label: const Text("Invite"),
+                    onPressed: () {
+                      Get.back();
+                      _showInviteDialog(listId);
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                /// Close button
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () => Get.back(),
+                    child: const Text("Close"),
+                  ),
+                ),
+              ],
             ),
-
-            const SizedBox(height: 20),
-
-            /// Label
-            const Text(
-              "SHARED WITH",
-              style: TextStyle(
-                fontSize: 12,
-                letterSpacing: 1.2,
-                color: Colors.grey,
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            /// Members list
-            Obx(() {
-              final list = controller.lists
-                  .firstWhere((e) => e.id == listId);
-
-              final data = list.data() as Map<String, dynamic>;
-              final members = List<String>.from(data["members"] ?? []);
-
-              return Wrap(
-                spacing: 10,
-                children: members.map((uid) {
-
-                  final letter = uid.substring(0, 1).toUpperCase();
-
-                  return _memberChip(letter, uid == controller.uid ? "You" : "Member",
-                      isOwner: uid == data["ownerId"]);
-
-                }).toList(),
-              );
-            }),
-
-            const SizedBox(height: 20),
-
-            /// Invite button
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                icon: const Icon(Icons.person_add_alt_1),
-                label: const Text("Invite"),
-                onPressed: () {
-                  Get.back();
-                  _showInviteDialog(listId);
-                },
-              ),
-            ),
-
-            const SizedBox(height: 10),
-
-            /// Close button
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () => Get.back(),
-                child: const Text("Close"),
-              ),
-            ),
-          ],
-        ),
+          )
       ),
     );
   }

@@ -13,7 +13,6 @@ class App extends StatelessWidget{
     return GetMaterialApp(
       title: "Application",
       initialRoute: AppPages.INITIAL,
-      getPages: AppPages.routes,
       theme: ThemeData.light().copyWith(
         textTheme: GoogleFonts.poppinsTextTheme(),
       ),
@@ -21,6 +20,5 @@ class App extends StatelessWidget{
             () => Get.put<AppController>(AppController(), permanent: true),
       ),
     );
-
   }
 }
