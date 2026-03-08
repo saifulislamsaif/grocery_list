@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:grocerry_list/app/modules/signup/views/LoginPage.dart';
 
 import '../../home/controllers/home_controller.dart';
 import '../../home/views/home_page.dart';
-import '../views/LoginPage.dart';
 
 
 class AuthController extends GetxController {
@@ -30,6 +30,7 @@ class AuthController extends GetxController {
   }
 
 
+
   Future<void> signUp(String name, String email, String password) async {
     try {
       UserCredential cred = await _auth.createUserWithEmailAndPassword(
@@ -44,6 +45,7 @@ class AuthController extends GetxController {
           "email": email,
           "created_at": FieldValue.serverTimestamp(),
         });
+        Get.offAll(() => LoginPage());
       }
     } catch (e) {
       Get.snackbar("Error", e.toString(), snackPosition: SnackPosition.BOTTOM);
@@ -74,6 +76,7 @@ class AuthController extends GetxController {
       );
     }
   }
+
   Future<void> logout() async {
     await FirebaseAuth.instance.signOut();
   }

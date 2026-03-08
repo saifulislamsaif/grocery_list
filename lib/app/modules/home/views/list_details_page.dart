@@ -125,7 +125,6 @@ class ListDetailsPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
 
-                /// drag indicator
                 Center(
                   child: Container(
                     height: 4,
@@ -138,7 +137,6 @@ class ListDetailsPage extends StatelessWidget {
                   ),
                 ),
 
-                /// Title
                 const Center(
                   child: Text(
                     "Shared Members",
@@ -175,7 +173,6 @@ class ListDetailsPage extends StatelessWidget {
 
                 const SizedBox(height: 12),
 
-                /// Members list
                 Obx(() {
                   final list = controller.lists.firstWhere((e) => e.id == listId);
 
@@ -198,9 +195,7 @@ class ListDetailsPage extends StatelessWidget {
                   );
                 }),
 
-                const SizedBox(height: 20),
-
-                /// Invite button
+                 SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
@@ -212,10 +207,7 @@ class ListDetailsPage extends StatelessWidget {
                     },
                   ),
                 ),
-
-                const SizedBox(height: 10),
-
-                /// Close button
+                 SizedBox(height: 10),
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton(

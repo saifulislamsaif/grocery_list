@@ -155,7 +155,7 @@ class HomePage extends StatelessWidget {
             const Center(
               child: Text(
                 "Create New List",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600,color: Colors.white),
               ),
             ),
 
@@ -205,7 +205,7 @@ class HomePage extends StatelessWidget {
 
                   await controller.createList(name);
 
-                  Get.back(); // Close sheet
+                  Get.back(); // Close bottom sheet
 
                   Get.snackbar(
                     "Success",
@@ -215,8 +215,9 @@ class HomePage extends StatelessWidget {
                 },
                 child: const Text(
                   "Create List",
-                  style: TextStyle(fontSize: 16),
+                  style: TextStyle(fontSize: 16,color: Colors.white),
                 ),
+
               ),
             ),
           ],
